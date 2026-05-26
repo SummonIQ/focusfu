@@ -9,9 +9,10 @@ interface AnimatedWordProps {
 }
 
 /**
- * Headline rotating word with a 3D-perspective "stage" floor beneath it
- * (the marker bar tilts back to look like the word is standing on a stage).
- * A thin blinking caret sits to the right.
+ * Headline rotating word with a trapezoidal "stage" beneath it.
+ * The stage is a clip-path trapezoid (wider at the front, tapered toward
+ * the back) with a luminous gradient — the word visibly stands on a
+ * receding 3D platform rather than a flat bar.
  */
 export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
   const current = CATEGORIES[activeIndex];
@@ -42,36 +43,37 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
       style={{
         minWidth: maxWidth ? `${maxWidth + 32}px` : undefined,
         height: '1.15em',
-        perspective: 600,
       }}
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={current.id}
-          initial={{ y: '0.45em', opacity: 0, filter: 'blur(6px)' }}
+          initial={{ y: '0.4em', opacity: 0, filter: 'blur(6px)' }}
           animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
-          exit={{ y: '-0.45em', opacity: 0, filter: 'blur(6px)' }}
+          exit={{ y: '-0.4em', opacity: 0, filter: 'blur(6px)' }}
           transition={{ duration: 0.42, ease: [0.25, 0.8, 0.25, 1] }}
           className="relative inline-flex flex-col items-center"
-          style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Stage floor — perspective-tilted bar so the word stands on it */}
+          {/* Trapezoidal stage floor — wider in front, tapered back */}
           <span
             aria-hidden
-            className="absolute left-1/2 -translate-x-1/2 bottom-[0.04em] h-[0.42em] w-[112%] rounded-[3px] bg-gradient-to-b from-brand-400/55 via-brand-500/45 to-brand-600/55 dark:from-brand-400/35 dark:via-brand-500/30 dark:to-brand-600/35"
+            className="absolute left-1/2 -translate-x-1/2 bottom-[0.08em] h-[0.6em] w-[145%]"
             style={{
-              transform: 'rotateX(58deg)',
-              transformOrigin: 'center top',
-              filter: 'blur(0.5px)',
+              clipPath: 'polygon(18% 0%, 82% 0%, 100% 100%, 0% 100%)',
+              background:
+                'linear-gradient(to bottom, rgba(245,158,11,0.28), rgba(245,158,11,0.85))',
               boxShadow:
-                '0 8px 18px -6px rgba(245,158,11,0.45), 0 -1px 0 rgba(255,255,255,0.18) inset',
+                '0 14px 28px -10px rgba(245,158,11,0.55), 0 -1px 0 rgba(255,200,120,0.4) inset',
             }}
           />
-          {/* Soft front-edge highlight on the stage */}
+          {/* Soft outer glow extending past the stage edges */}
           <span
             aria-hidden
-            className="absolute left-1/2 -translate-x-1/2 bottom-[0.04em] h-[2px] w-[112%] rounded-full bg-white/60 dark:bg-white/30 mix-blend-overlay"
-            style={{ transform: 'rotateX(58deg)', transformOrigin: 'center top' }}
+            className="absolute left-1/2 -translate-x-1/2 bottom-[-0.05em] h-[0.7em] w-[170%] rounded-[50%] blur-xl opacity-60"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, rgba(245,158,11,0.55), rgba(245,158,11,0) 70%)',
+            }}
           />
 
           <span className="relative font-bold tracking-tight text-brand-700 dark:text-brand-300">
@@ -80,10 +82,9 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         </motion.span>
       </AnimatePresence>
 
-      {/* Thin blinking caret */}
       <span
         aria-hidden
-        className="caret ml-[0.15em] inline-block bg-brand-600 dark:bg-brand-300"
+        className="caret ml-[0.12em] inline-block bg-brand-600 dark:bg-brand-300"
       />
     </span>
   );

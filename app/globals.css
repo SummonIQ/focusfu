@@ -46,7 +46,7 @@
     --foreground: 260 18% 14%;
     --muted: 42 15% 92%;
     --muted-foreground: 260 8% 42%;
-    --border: 42 14% 86%;
+    --border: 42 14% 78%;           /* a touch darker for visible separation */
     --paper: 40 40% 99%;
     --primary-rgb: 245, 158, 11;    /* amber-500-ish for canvas glow */
     --primary-glow: 251, 113, 133;  /* coral */
@@ -58,8 +58,8 @@
       --foreground: 42 25% 96%;
       --muted: 260 18% 11%;
       --muted-foreground: 260 10% 65%;
-      --border: 260 16% 16%;
-      --paper: 260 20% 8%;
+      --border: 260 20% 26%;        /* stronger so panels read in dark mode */
+      --paper: 260 20% 9%;
       --primary-rgb: 252, 184, 64;
       --primary-glow: 255, 138, 138;
     }
@@ -171,5 +171,14 @@
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   background: hsla(var(--paper) / 0.7);
-  border: 1px solid hsla(var(--border) / 1);
+  border: 1px solid hsl(var(--border));
+}
+
+/* Themed border utilities — use these instead of border-foreground/X for
+   consistent dark-mode contrast. */
+.border-panel {
+  border-color: hsl(var(--border));
+}
+.divide-panel > :not([hidden]) ~ :not([hidden]) {
+  border-color: hsl(var(--border));
 }

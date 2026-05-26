@@ -9,7 +9,6 @@ import { SpacesStack } from './spaces-stack';
 import { CATEGORIES } from './categories';
 
 export function Hero() {
-  // Single source of truth for word + windows
   const [activeIndex, setActiveIndex] = useState(0);
   useEffect(() => {
     const id = setInterval(() => {
@@ -28,24 +27,21 @@ export function Hero() {
         } as React.CSSProperties
       }
     >
-      {/* Layered background — cream/paper light, ink dark */}
       <div className="absolute inset-0 -z-30 bg-paper" />
       <div className="absolute inset-0 -z-20 bg-dots [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
 
-      {/* Warm ambient blobs */}
       <div aria-hidden className="absolute inset-0 -z-20 overflow-hidden">
         <div className="absolute -top-32 -right-32 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-brand-300/40 to-accent-400/25 blur-3xl animate-[blob_14s_ease-in-out_infinite] dark:from-brand-700/35 dark:to-accent-700/20" />
         <div className="absolute -bottom-44 -left-44 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-accent-300/35 to-brand-400/25 blur-3xl animate-[blob_16s_ease-in-out_infinite] [animation-delay:-4s] dark:from-accent-700/30 dark:to-brand-700/20" />
       </div>
 
-      {/* Pointer-tracked spotlight */}
       <InteractiveSpotlight className="-z-10" />
 
       <div className="relative mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)] gap-10 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.25fr)] gap-10 lg:gap-12 items-center">
           {/* Copy column */}
-          <div className="relative max-w-xl">
-            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-paper border border-brand-500/20 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
+          <div className="relative max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-paper border border-brand-500/30 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
                 <span className="relative inline-block h-2 w-2 rounded-full bg-emerald-500" />
@@ -53,12 +49,11 @@ export function Hero() {
               <span className="text-foreground/80 font-mono">v0.9 beta · macOS 12+</span>
             </div>
 
-            <h1 className="font-display text-[2.5rem] sm:text-5xl lg:text-[3.6rem] xl:text-[4.2rem] font-bold tracking-tight leading-[1.04] mb-7">
-              <span className="block text-foreground">Focus on</span>
-              <span className="block">
-                <AnimatedWord activeIndex={activeIndex} />
+            <h1 className="font-display text-[2.4rem] sm:text-[2.9rem] lg:text-[3rem] xl:text-[3.4rem] font-bold tracking-tight leading-[1.06] mb-7">
+              <span className="block lg:whitespace-nowrap">
+                Focus on <AnimatedWord activeIndex={activeIndex} />
               </span>
-              <span className="block text-foreground">in one keystroke.</span>
+              <span className="block">in one keystroke.</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground max-w-lg mb-9 leading-relaxed">
@@ -78,7 +73,7 @@ export function Hero() {
               </Link>
               <Link
                 href="#pricing"
-                className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3.5 text-sm font-medium border border-foreground/15 bg-paper backdrop-blur-md hover:border-brand-500/40 transition-all"
+                className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3.5 text-sm font-medium border border-foreground/20 bg-paper backdrop-blur-md hover:border-brand-500/40 transition-all"
               >
                 See pricing
                 <ArrowRight className="h-4 w-4" />
@@ -92,7 +87,7 @@ export function Hero() {
             </ul>
           </div>
 
-          {/* Visual column — bigger, with bleed */}
+          {/* Visual column */}
           <div className="relative">
             <div className="absolute -inset-10 rounded-[2.5rem] bg-gradient-to-br from-brand-400/25 via-accent-400/20 to-brand-500/10 blur-3xl -z-10" />
             <SpacesStack activeIndex={activeIndex} />
@@ -100,7 +95,6 @@ export function Hero() {
         </div>
       </div>
 
-      {/* fade-out */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background" />
     </section>
   );

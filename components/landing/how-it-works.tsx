@@ -31,7 +31,7 @@ export function HowItWorks() {
           {STEPS.map((s, i) => (
             <div
               key={s.n}
-              className="relative rounded-2xl p-7 border border-foreground/10 bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm overflow-hidden group hover:border-brand-500/30 transition-colors"
+              className="relative rounded-2xl p-7 border border-panel bg-paper/70 backdrop-blur-sm overflow-hidden group hover:border-brand-500/40 transition-colors"
             >
               <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-gradient-to-br from-brand-500/15 to-accent-500/15 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="text-xs font-mono text-brand-600 dark:text-brand-400 mb-4 tabular-nums">{s.n}</div>

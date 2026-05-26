@@ -54,13 +54,13 @@ export function Features() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-foreground/5 rounded-3xl overflow-hidden border border-foreground/5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-panel rounded-3xl overflow-hidden border border-panel" style={{ background: 'hsl(var(--border))' }}>
           {FEATURES.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
               className="relative p-7 bg-background hover:bg-gradient-to-br hover:from-brand-50 hover:to-white dark:hover:from-brand-950/40 dark:hover:to-black transition-colors group"
             >
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500/15 to-accent-500/15 border border-brand-500/20 text-brand-600 dark:text-brand-300 mb-5 group-hover:scale-110 transition-transform">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500/15 to-accent-500/15 border border-brand-500/35 text-brand-600 dark:text-brand-300 mb-5 group-hover:scale-110 transition-transform">
                 <Icon className="h-5 w-5" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{title}</h3>
