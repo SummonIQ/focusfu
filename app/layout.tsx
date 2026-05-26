@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { AppAnalyticsProvider } from '@/components/providers/analytics-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -51,7 +52,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <AppAnalyticsProvider>{children}</AppAnalyticsProvider>
+      </body>
     </html>
   );
 }
