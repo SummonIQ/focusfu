@@ -83,6 +83,41 @@ const TRANSITION = {
 } as unknown as Transition;
 
 /**
+ * Per-character diagonal gradient overlay for the rotating headline word.
+ * Each letter has its own 135° gradient (lighter top-left → darker
+ * bottom-right) so the typography reads with subtle facet shading. The
+ * brand→stone mask-stop sweep still applies on top via a stacked
+ * vertical gradient that reveals stone from the bottom as the word
+ * descends through the platform.
+ */
+function PerCharGradientLabel({ text }: { text: string }) {
+  const chars = Array.from(text);
+  return (
+    <>
+      {chars.map((char, i) => (
+        <span
+          key={`${i}-${char}`}
+          style={{
+            display: 'inline-block',
+            whiteSpace: 'pre',
+            // Two stacked backgrounds, clipped to the glyph:
+            //   1. (top layer) stone color revealed bottom-up via --mask-stop
+            //   2. (bottom layer) diagonal lighter→darker brand gradient
+            backgroundImage:
+              'linear-gradient(to bottom, transparent calc(var(--mask-stop, 100%) - 2%), var(--word-below) calc(var(--mask-stop, 100%) + 2%)), linear-gradient(135deg, var(--char-light) 0%, var(--char-dark) 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}
+        >
+          {char}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/**
  * Per-character skew for the cast shadow. Letters near the centre stay
  * nearly vertical; letters at the ends fan INWARD (left edge tilts right,
  * right edge tilts left). Quadratic falloff keeps the middle clean and
@@ -223,7 +258,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.08em',
+          bottom: '-0.03em',
           height: '0.52em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
@@ -248,7 +283,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute pointer-events-none z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.08em',
+          bottom: '-0.03em',
           height: '0.52em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
@@ -284,7 +319,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
               filter: 'blur(0.6px)',
             }}
           >
-            {current.label}
+            <SkewedShadow text={current.label} />
           </motion.span>
         </AnimatePresence>
       </motion.div>
@@ -299,15 +334,8 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           exit={EXIT}
           transition={TRANSITION}
           className="absolute left-0 top-0 font-bold tracking-tight whitespace-nowrap z-[3]"
-          style={{
-            backgroundImage:
-              'linear-gradient(to bottom, var(--word-above) 0%, var(--word-above) calc(var(--mask-stop, 100%) - 2%), var(--word-below) calc(var(--mask-stop, 100%) + 2%), var(--word-below) 100%)',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            color: 'transparent',
-          }}
         >
-          {current.label}
+          <PerCharGradientLabel text={current.label} />
         </motion.span>
       </AnimatePresence>
     </span>

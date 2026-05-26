@@ -57,6 +57,9 @@
     --word-above: oklch(0.6 0.155 48);   /* brand-700 */
     --word-below: oklch(0.46 0.025 265); /* neutral ink */
     --stage-rgb: 120, 113, 108;          /* stone-500 — platform tone */
+    /* Per-letter diagonal gradient endpoints (light TL → dark BR) */
+    --char-light: oklch(0.74 0.17 55);   /* brighter highlight */
+    --char-dark:  oklch(0.5 0.135 45);   /* deeper shadow tone */
   }
 
   @media (prefers-color-scheme: dark) {
@@ -73,6 +76,8 @@
       --word-above: oklch(0.875 0.13 72);  /* brand-300 */
       --word-below: oklch(0.72 0.012 260); /* neutral ink-300 */
       --stage-rgb: 168, 162, 158;
+      --char-light: oklch(0.93 0.13 75);
+      --char-dark:  oklch(0.74 0.15 60);
     }
   }
 
