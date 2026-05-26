@@ -31,10 +31,12 @@ interface AnimatedWordProps {
  *    letters with descenders cast denser shadow tips.
  */
 
-const PLATFORM_OVERHANG = 24;
-// Light inset so the trapezoid still narrows toward the back but the
-// platform's top edge always extends fully past the word's left/right
-// letters regardless of word length.
+const PLATFORM_OVERHANG_LEFT = 24;
+const PLATFORM_OVERHANG_RIGHT = 28; // slightly more on the right so the
+                                    // trapezoid clip's perspective taper
+                                    // doesn't appear to leave the last
+                                    // letter hanging over the edge.
+const PLATFORM_OVERHANG_TOTAL = PLATFORM_OVERHANG_LEFT + PLATFORM_OVERHANG_RIGHT;
 const PLATFORM_CLIP = 'polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%)';
 
 const INITIAL = {
@@ -169,7 +171,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
     };
   }, [activeIndex]);
 
-  const platformWidth = currentWordWidth + PLATFORM_OVERHANG * 2;
+  const platformWidth = currentWordWidth + PLATFORM_OVERHANG_TOTAL;
   const platformAnimate = {
     width: platformWidth,
     rotateX: 52,
@@ -227,9 +229,11 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         aria-hidden
         className="absolute z-[2]"
         style={{
-          left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.03em',
-          height: '0.52em',
+          left: `-${PLATFORM_OVERHANG_LEFT}px`,
+          // Platform top sits just below descender ends so g/p/y/j
+          // never get clipped by the slab.
+          bottom: '-0.34em',
+          height: '0.46em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           background:
@@ -252,9 +256,11 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         aria-hidden
         className="absolute pointer-events-none z-[2]"
         style={{
-          left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.03em',
-          height: '0.52em',
+          left: `-${PLATFORM_OVERHANG_LEFT}px`,
+          // Platform top sits just below descender ends so g/p/y/j
+          // never get clipped by the slab.
+          bottom: '-0.34em',
+          height: '0.46em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           overflow: 'hidden',
@@ -280,14 +286,16 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
             className="font-bold tracking-tight whitespace-nowrap"
             style={{
               position: 'absolute',
-              left: PLATFORM_OVERHANG,
+              left: PLATFORM_OVERHANG_LEFT,
               bottom: '100%',
-              // No skewX — each letter's shadow sits directly under its
-              // glyph instead of drifting sideways.
-              transform: 'translateY(0.34em)',
+              // Shadow text's TOP sits right at the platform's surface
+              // (the letter bottoms touch and project down into the
+              // slab). All letters cast a visible shadow, not just
+              // those with descenders.
+              transform: 'translateY(0.32em)',
               transformOrigin: 'left bottom',
               backgroundImage:
-                'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 88%, rgba(0,0,0,0.78) 100%)',
+                'linear-gradient(to bottom, rgba(0,0,0,0) 18%, rgba(0,0,0,0.18) 42%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.82) 100%)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               color: 'transparent',

@@ -85,16 +85,16 @@ function BrowserWindow() {
 
 function DinoBrowser() {
   return (
-    <div className="relative h-full w-full">
-      <div className="flex items-center gap-1.5 mb-1.5">
+    <div className="relative h-full w-full flex flex-col">
+      <div className="flex items-center gap-1.5 mb-1.5 shrink-0">
         <div className="text-[8px] text-emerald-300/80">●</div>
         <div className="flex-1 h-4 rounded-sm bg-white/10 border border-white/10 px-1.5 flex items-center gap-1">
           <span className="text-[7px] font-mono text-white/40">🔒</span>
           <span className="text-[7px] font-mono text-white/60">dinosaurs.world/t-rex</span>
         </div>
       </div>
-      <div className="text-[10px] font-bold text-amber-200">🦖 Dinosaur Encyclopedia</div>
-      <div className="mt-1 rounded-md border border-amber-400/40 bg-gradient-to-br from-amber-800/40 to-rose-900/30 p-1.5">
+      <div className="text-[10px] font-bold text-amber-200 shrink-0">🦖 Dinosaur Encyclopedia</div>
+      <div className="mt-1 rounded-md border border-amber-400/40 bg-gradient-to-br from-amber-800/40 to-rose-900/30 p-1.5 shrink-0">
         <div className="flex items-start gap-1.5">
           <div className="h-12 w-12 rounded-sm bg-gradient-to-br from-amber-400/60 via-orange-500/50 to-rose-500/40 border border-amber-300/40 shrink-0 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-radial from-white/15 to-transparent" />
@@ -106,16 +106,65 @@ function DinoBrowser() {
           </div>
         </div>
       </div>
-      <div className="flex gap-1 mt-1.5">
+      <div className="flex gap-1 mt-1.5 shrink-0">
         {['Theropoda', 'North America', 'Apex'].map((t) => (
-          <span key={t} className="text-[6px] font-mono rounded px-1 py-0.5 bg-white/8 border border-white/10 text-white/70">{t}</span>
+          <span key={t} className="text-[6px] font-mono rounded px-1 py-0.5 bg-white/[0.08] border border-white/10 text-white/70">{t}</span>
         ))}
       </div>
-      <div className="text-[7px] font-mono text-amber-300/80 mt-1.5">Related</div>
-      <div className="grid grid-cols-3 gap-0.5 mt-0.5">
-        {['Triceratops', 'Velociraptor', 'Stegosaurus'].map((d) => (
-          <div key={d} className="rounded-sm bg-white/5 border border-white/10 px-1 py-0.5 text-[6px] font-mono text-white/60 truncate">{d}</div>
+
+      {/* Description */}
+      <div className="mt-2 space-y-[2px] shrink-0">
+        <div className="text-[7px] text-white/75 leading-[1.5]">One of the largest land predators that ever lived. The T. rex roamed western North America at the end of the Cretaceous Period.</div>
+      </div>
+
+      {/* Classification table */}
+      <div className="mt-2 grid grid-cols-2 gap-1 shrink-0">
+        {[
+          ['Kingdom', 'Animalia'],
+          ['Phylum', 'Chordata'],
+          ['Class', 'Reptilia'],
+          ['Order', 'Saurischia'],
+          ['Family', 'Tyrannosauridae'],
+          ['Genus', 'Tyrannosaurus'],
+        ].map(([k, v]) => (
+          <div key={k} className="flex items-baseline gap-1 text-[6.5px] font-mono">
+            <span className="text-amber-300/70 w-12 shrink-0">{k}</span>
+            <span className="text-white/80 truncate">{v}</span>
+          </div>
         ))}
+      </div>
+
+      {/* Notable facts */}
+      <div className="mt-2 space-y-[2px] shrink-0">
+        <div className="text-[7px] font-mono text-amber-300/80">Notable</div>
+        {[
+          'Could grow up to 12.3 m long',
+          'Skull alone weighed ~600 kg',
+          'Bite force exceeded 12,800 lbs',
+          'Lived in herds, hunted in packs',
+        ].map((f) => (
+          <div key={f} className="text-[6.5px] text-white/65 flex items-start gap-1">
+            <span className="text-amber-300/60 mt-[1px]">▸</span>
+            <span>{f}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Related grid */}
+      <div className="mt-auto pt-2 shrink-0">
+        <div className="text-[7px] font-mono text-amber-300/80 mb-0.5">Related species</div>
+        <div className="grid grid-cols-3 gap-1">
+          {[
+            { n: 'Triceratops', g: 'from-emerald-400/40 to-teal-500/30' },
+            { n: 'Velociraptor', g: 'from-cyan-400/40 to-sky-500/30' },
+            { n: 'Stegosaurus', g: 'from-rose-400/40 to-orange-500/30' },
+          ].map((d) => (
+            <div key={d.n} className="rounded-sm bg-white/5 border border-white/10 p-1 flex items-center gap-1">
+              <div className={cn('h-3 w-3 rounded-sm bg-gradient-to-br', d.g)} />
+              <span className="text-[6px] font-mono text-white/70 truncate">{d.n}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -622,30 +671,92 @@ function SidebarNotes() {
 
 /* =============== PROJECTS (planning) =============== */
 
+type KanbanCard = { t: string; tag: string; p?: number; who?: string };
+type KanbanCol = { title: string; count: number; color: 'rose' | 'amber' | 'emerald'; items: KanbanCard[] };
+
 function KanbanWindow() {
+  const cols: KanbanCol[] = [
+    {
+      title: 'Todo', count: 9, color: 'rose',
+      items: [
+        { t: 'Spec the migration plan', tag: 'eng', p: 2 },
+        { t: 'Sketch onboarding v2', tag: 'design', p: 1 },
+        { t: 'Audit dependency tree', tag: 'eng', p: 3 },
+        { t: 'Draft Q2 OKRs', tag: 'ops' },
+        { t: 'Investor update', tag: 'ops', p: 1 },
+        { t: 'Review legal contract', tag: 'biz' },
+        { t: 'Hire mobile dev', tag: 'biz', p: 2 },
+        { t: 'Update changelog', tag: 'docs' },
+        { t: 'Triage inbox bugs', tag: 'eng' },
+      ],
+    },
+    {
+      title: 'Doing', count: 4, color: 'amber',
+      items: [
+        { t: 'Wire Stripe checkout', tag: 'eng', p: 1, who: 'SB' },
+        { t: 'Redesign settings panel', tag: 'design', who: 'PR' },
+        { t: 'Pricing landing page', tag: 'web', p: 1, who: 'LM' },
+        { t: 'Auth refactor', tag: 'eng', who: 'SB' },
+      ],
+    },
+    {
+      title: 'Done', count: 12, color: 'emerald',
+      items: [
+        { t: 'Approve pricing tiers', tag: 'biz' },
+        { t: 'Wire analytics events', tag: 'eng' },
+        { t: 'Onboarding video', tag: 'design' },
+        { t: 'Replay user sessions', tag: 'ux' },
+        { t: 'Polish hero animation', tag: 'web' },
+        { t: 'FAQ copy', tag: 'docs' },
+        { t: 'Set up status page', tag: 'eng' },
+        { t: 'Press release draft', tag: 'biz' },
+        { t: 'A11y pass on forms', tag: 'eng' },
+      ],
+    },
+  ];
+  const accent = (c: 'rose' | 'amber' | 'emerald') =>
+    c === 'rose' ? 'bg-rose-400/35 border-rose-300/50' :
+    c === 'amber' ? 'bg-amber-400/35 border-amber-300/55' :
+    'bg-emerald-400/30 border-emerald-300/45';
+  const tagTone: Record<string, string> = {
+    eng: 'text-sky-200/85',
+    design: 'text-fuchsia-200/85',
+    web: 'text-cyan-200/85',
+    biz: 'text-amber-200/85',
+    ops: 'text-emerald-200/85',
+    docs: 'text-violet-200/85',
+    ux: 'text-rose-200/85',
+  };
   return (
     <div className="grid grid-cols-3 gap-1 h-full w-full">
-      {[
-        { title: 'Todo', count: 4, color: 'rose' as const },
-        { title: 'Doing', count: 2, color: 'amber' as const },
-        { title: 'Done', count: 7, color: 'emerald' as const },
-      ].map((col) => (
-        <div key={col.title} className="rounded-md bg-white/[0.05] border border-white/10 p-1.5">
-          <div className="flex items-center justify-between mb-1">
+      {cols.map((col) => (
+        <div key={col.title} className="rounded-md bg-white/[0.05] border border-white/10 p-1.5 flex flex-col min-h-0">
+          <div className="flex items-center justify-between mb-1 shrink-0">
             <span className="text-[8px] font-mono text-violet-100/90">{col.title}</span>
             <span className="text-[8px] font-mono text-violet-200/55">{col.count}</span>
           </div>
-          <div className="space-y-1">
-            {Array.from({ length: col.title === 'Doing' ? 2 : 3 }).map((_, i) => (
+          <div className="space-y-[3px] overflow-hidden flex-1">
+            {col.items.map((it, i) => (
               <div
                 key={i}
-                className={cn(
-                  'h-3 rounded-sm border',
-                  col.color === 'rose' && 'bg-rose-400/30 border-rose-300/40',
-                  col.color === 'amber' && 'bg-amber-400/30 border-amber-300/40',
-                  col.color === 'emerald' && 'bg-emerald-400/30 border-emerald-300/40',
+                className={cn('rounded-sm border px-1 py-[2px] flex items-center gap-1', accent(col.color))}
+              >
+                {it.p && (
+                  <span className={cn(
+                    'h-1 w-1 rounded-full shrink-0',
+                    it.p === 1 ? 'bg-rose-300' : it.p === 2 ? 'bg-amber-300' : 'bg-emerald-300'
+                  )} />
                 )}
-              />
+                <span className="text-[6.5px] font-mono text-white/85 truncate flex-1">{it.t}</span>
+                <span className={cn('text-[6px] font-mono shrink-0', tagTone[it.tag] ?? 'text-white/55')}>
+                  {it.tag}
+                </span>
+                {it.who && (
+                  <span className="text-[6px] font-mono text-white/70 bg-white/10 rounded-sm px-[2px] shrink-0">
+                    {it.who}
+                  </span>
+                )}
+              </div>
             ))}
           </div>
         </div>

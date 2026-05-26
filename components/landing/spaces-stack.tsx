@@ -83,7 +83,7 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
     <motion.div
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      className="relative h-[600px] sm:h-[700px] lg:h-[820px] w-full select-none"
+      className="relative h-[600px] sm:h-[700px] lg:h-[820px] w-full select-none -mt-20 lg:ml-8"
       style={{ perspective: 1600 }}
     >
       <motion.div
@@ -111,33 +111,31 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={category.id}
+                  // Float UP into position, splay outward (x to slot
+                  // offset is already on the parent div), no rotation
+                  // on entry/exit — reads as cards rising into place
+                  // rather than tumbling in.
                   initial={{
                     opacity: 0,
-                    x: slot.enterX,
-                    y: -18,
+                    y: 40,
                     scale: 0.92,
-                    rotateY: -22,
                     filter: 'blur(8px)',
                   }}
                   animate={{
                     opacity: 1,
-                    x: 0,
                     y: 0,
                     scale: 1,
-                    rotateY: 0,
                     filter: 'blur(0px)',
                   }}
                   exit={{
                     opacity: 0,
-                    x: slot.exitX,
-                    y: 18,
-                    scale: 0.92,
-                    rotateY: 22,
+                    y: 40,
+                    scale: 0.94,
                     filter: 'blur(8px)',
                   }}
                   transition={{
-                    duration: 0.65,
-                    delay: i * 0.08,
+                    duration: 0.6,
+                    delay: i * 0.06,
                     ease: [0.32, 0.72, 0.32, 1],
                   }}
                   style={{ transformStyle: 'preserve-3d' }}
@@ -156,16 +154,6 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
         className="absolute left-1/2 bottom-4 -translate-x-1/2 h-12 w-[70%] rounded-full bg-brand-500/30 dark:bg-brand-400/20 blur-3xl"
       />
 
-      {/* Keyboard hint */}
-      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-mono z-20">
-        <Kbd>⌘</Kbd>
-        <Kbd>⇥</Kbd>
-        <span className="ml-1">switch</span>
-        <span className="opacity-50 mx-2">·</span>
-        <Kbd>⌥</Kbd>
-        <Kbd>1</Kbd>
-        <span className="ml-1">jump</span>
-      </div>
     </motion.div>
   );
 }
@@ -221,10 +209,3 @@ function Window({ win, active }: { win: Category['windows'][number]; active: boo
   );
 }
 
-function Kbd({ children }: { children: React.ReactNode }) {
-  return (
-    <kbd className="inline-flex items-center justify-center h-5 min-w-[1.25rem] px-1 rounded border border-foreground/15 bg-foreground/5 text-[10px] text-foreground/80">
-      {children}
-    </kbd>
-  );
-}

@@ -24,25 +24,46 @@ const markMaskStyle: CSSProperties = {
  * a hard rectangle.
  */
 
+// Main frosted-glass surface. Heavy saturate + brightness + contrast
+// boost makes content passing beneath visibly "pop" — reads like the
+// header is a magnifying lens, not just a blurred panel.
 const backdropStyle: CSSProperties = {
   height: '200%',
   background:
-    'linear-gradient(to bottom, color-mix(in srgb, hsl(var(--background)) 85%, transparent) 0%, color-mix(in srgb, hsl(var(--background)) 0%, transparent) 50%)',
-  backdropFilter: 'blur(22px) saturate(160%) brightness(1.06)',
-  WebkitBackdropFilter: 'blur(22px) saturate(160%) brightness(1.06)',
+    'linear-gradient(to bottom, color-mix(in srgb, hsl(var(--background)) 78%, transparent) 0%, color-mix(in srgb, hsl(var(--background)) 0%, transparent) 50%)',
+  backdropFilter:
+    'blur(24px) saturate(220%) brightness(1.18) contrast(1.08)',
+  WebkitBackdropFilter:
+    'blur(24px) saturate(220%) brightness(1.18) contrast(1.08)',
   maskImage:
     'linear-gradient(to bottom, black 0%, black 50%, transparent 50%, transparent 100%)',
   WebkitMaskImage:
     'linear-gradient(to bottom, black 0%, black 50%, transparent 50%, transparent 100%)',
 };
 
+// Refraction band right at the bottom edge — exaggerated saturate +
+// contrast so the boundary line itself looks like a piece of glass
+// catching light off whatever is sliding underneath.
+const lensRefractionStyle: CSSProperties = {
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  bottom: 0,
+  height: 6,
+  transform: 'translateY(50%)',
+  backdropFilter: 'blur(2px) saturate(280%) brightness(1.3) contrast(1.18)',
+  WebkitBackdropFilter:
+    'blur(2px) saturate(280%) brightness(1.3) contrast(1.18)',
+  pointerEvents: 'none',
+};
+
 const bottomEdgeStyle: CSSProperties = {
   height: '100%',
   transform: 'translateY(100%)',
-  background: 'color-mix(in srgb, hsl(var(--foreground)) 4%, transparent)',
-  backdropFilter: 'blur(16px) brightness(180%) saturate(130%) contrast(110%)',
+  background: 'color-mix(in srgb, hsl(var(--foreground)) 6%, transparent)',
+  backdropFilter: 'blur(18px) brightness(190%) saturate(150%) contrast(115%)',
   WebkitBackdropFilter:
-    'blur(16px) brightness(180%) saturate(130%) contrast(110%)',
+    'blur(18px) brightness(190%) saturate(150%) contrast(115%)',
   pointerEvents: 'none',
   maskImage: 'linear-gradient(to bottom, black 0, black 1px, transparent 1px)',
   WebkitMaskImage:
@@ -50,10 +71,10 @@ const bottomEdgeStyle: CSSProperties = {
 };
 
 const topEdgeStyle: CSSProperties = {
-  opacity: 0.7,
-  backdropFilter: 'blur(16px) saturate(250%) brightness(200%) contrast(120%)',
+  opacity: 0.78,
+  backdropFilter: 'blur(16px) saturate(280%) brightness(210%) contrast(125%)',
   WebkitBackdropFilter:
-    'blur(16px) saturate(250%) brightness(200%) contrast(120%)',
+    'blur(16px) saturate(280%) brightness(210%) contrast(125%)',
   maskImage:
     'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
   WebkitMaskImage:
@@ -134,11 +155,12 @@ export function Header() {
           </div>
         </div>
 
-        {/* Hairline + top-edge highlight */}
+        {/* Lens refraction strip + hairline + top-edge highlight */}
         <div
           className="pointer-events-none absolute -top-px right-0 left-0 z-20 h-0.5"
           style={topEdgeStyle}
         />
+        <div style={lensRefractionStyle} />
         <div
           className="pointer-events-none absolute inset-0 z-20"
           style={bottomEdgeStyle}
