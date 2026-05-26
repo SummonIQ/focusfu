@@ -40,9 +40,9 @@ export function Hero() {
       <div className="relative mx-auto max-w-7xl px-6">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] gap-10 lg:gap-12 items-start">
           {/* Copy column — sits above the visual cards so bleed never covers text.
-              lg:pt-6 nudges only the copy down ~24px on desktop; the visual
-              column stays where it was. */}
-          <div className="relative max-w-2xl z-10 lg:pt-6">
+              Generous top padding pushes the copy column down so it sits
+              vertically in the page, while the visual column stays anchored. */}
+          <div className="relative max-w-2xl z-10 pt-10 sm:pt-14 lg:pt-20">
             <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-paper border border-brand-500/30 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />

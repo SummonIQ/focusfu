@@ -14,7 +14,11 @@ interface AnimatedWordProps {
  *    anchored to the LEFT. Width tracks the current word + 8px overhang
  *    on each side; left edge never moves.
  *  - Word drops in from above, lands with a spring bounce (platform
- *    compresses for ~120ms), dwells, then evaporates upward (blur + fade).
+ *    compresses for ~120ms), dwells, then sinks DOWN through the
+ *    platform. As it crosses the platform line a bottom-up gradient on
+ *    its text fill sweeps from brand color to stone — so the portion
+ *    below the platform reads as neutral while the portion above stays
+ *    brand. Below the platform it disintegrates (blur + fade).
  *  - Width is measured via refs INSIDE the headline so it uses the
  *    correct font context, not document.body.
  */
@@ -24,6 +28,7 @@ const INITIAL = {
   opacity: 0,
   scale: 0.96,
   filter: 'blur(0px)',
+  '--mask-stop': '100%',
 } as unknown as TargetAndTransition;
 
 const ANIMATE = {
@@ -31,17 +36,19 @@ const ANIMATE = {
   opacity: 1,
   scale: 1,
   filter: 'blur(0px)',
+  '--mask-stop': '100%',
 } as unknown as TargetAndTransition;
 
 const EXIT = {
-  y: ['0em', '-0.15em', '-0.55em'],
+  y: ['0em', '0.55em', '1.4em'],
   opacity: [1, 1, 0],
-  scale: [1, 1, 0.95],
-  filter: ['blur(0px)', 'blur(2px)', 'blur(10px)'],
+  scale: [1, 1, 0.92],
+  filter: ['blur(0px)', 'blur(0.5px)', 'blur(10px)'],
+  '--mask-stop': ['100%', '38%', '0%'],
   transition: {
-    duration: 0.7,
-    times: [0, 0.35, 1],
-    ease: [0.4, 0, 0.7, 1],
+    duration: 0.78,
+    times: [0, 0.4, 1],
+    ease: [0.5, 0, 0.7, 1],
   },
 } as unknown as TargetAndTransition;
 
@@ -174,7 +181,11 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         }}
       />
 
-      {/* Rotating word — drops in, dwells, evaporates upward */}
+      {/* Rotating word — drops in, dwells, sinks DOWN through the platform.
+          A vertical gradient on the text fill is keyed off --mask-stop:
+          above the cursor = brand color, below = neutral stone. As the
+          word descends, --mask-stop sweeps 100% → 0% so the stone region
+          rises up the word in sync with crossing the platform line. */}
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={current.id}
@@ -182,7 +193,14 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           animate={ANIMATE}
           exit={EXIT}
           transition={TRANSITION}
-          className="absolute left-0 top-0 font-bold tracking-tight whitespace-nowrap text-brand-700 dark:text-brand-300 z-[3]"
+          className="absolute left-0 top-0 font-bold tracking-tight whitespace-nowrap z-[3]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to bottom, var(--word-above) 0%, var(--word-above) var(--mask-stop, 100%), var(--word-below) var(--mask-stop, 100%), var(--word-below) 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}
         >
           {current.label}
         </motion.span>

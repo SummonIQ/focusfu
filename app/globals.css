@@ -51,10 +51,12 @@
     --primary-rgb: 245, 158, 11;    /* amber-500-ish for canvas glow */
     --primary-glow: 251, 113, 133;  /* coral */
 
-    /* Headline word colors: above-platform / below-platform */
-    --word-above: #b45309;          /* amber-700 */
-    --word-below: #44403c;          /* stone-700 */
-    --stage-rgb: 120, 113, 108;     /* stone-500 — the platform tone */
+    /* Headline word colors — above-platform matches text-brand-700 used
+       across the rest of the site so the visible word never shifts hue.
+       Below-platform is a neutral stone for the drop-through sweep. */
+    --word-above: oklch(0.6 0.155 48);   /* brand-700 */
+    --word-below: oklch(0.46 0.025 265); /* neutral ink */
+    --stage-rgb: 120, 113, 108;          /* stone-500 — platform tone */
   }
 
   @media (prefers-color-scheme: dark) {
@@ -68,8 +70,8 @@
       --primary-rgb: 252, 184, 64;
       --primary-glow: 255, 138, 138;
 
-      --word-above: #fcd34d;        /* amber-300 */
-      --word-below: #a8a29e;        /* stone-400 */
+      --word-above: oklch(0.875 0.13 72);  /* brand-300 */
+      --word-below: oklch(0.72 0.012 260); /* neutral ink-300 */
       --stage-rgb: 168, 162, 158;
     }
   }
