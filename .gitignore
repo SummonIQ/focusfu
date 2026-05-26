@@ -15,6 +15,3 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 
 generated/
-
-# Source brand asset bundle — copied into public/ as needed
-focusfu-final-clean-weighted-assets/

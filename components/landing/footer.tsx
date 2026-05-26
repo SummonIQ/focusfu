@@ -7,14 +7,14 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-3">
           <Image
-            src="/focusfu-lockup-navy.svg"
+            src="/branding/lockup-navy.svg"
             alt="FocusFu"
             width={808}
             height={270}
             className="h-5 w-auto block dark:hidden"
           />
           <Image
-            src="/focusfu-lockup-white.svg"
+            src="/branding/lockup-white.svg"
             alt="FocusFu"
             width={808}
             height={270}

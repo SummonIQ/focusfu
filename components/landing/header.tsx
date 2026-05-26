@@ -2,68 +2,137 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { cn } from '@/lib/css';
+import { type CSSProperties } from 'react';
+
+/**
+ * Frosted-glass header inspired by bizfoo: a 200%-tall backdrop with a
+ * vertical mask that fades to transparent, plus a 1px bottom hairline and
+ * a soft top-edge highlight. Sits on top of the page without ever forming
+ * a hard rectangle.
+ */
+
+const backdropStyle: CSSProperties = {
+  height: '200%',
+  background:
+    'linear-gradient(to bottom, color-mix(in srgb, hsl(var(--background)) 85%, transparent) 0%, color-mix(in srgb, hsl(var(--background)) 0%, transparent) 50%)',
+  backdropFilter: 'blur(22px) saturate(160%) brightness(1.06)',
+  WebkitBackdropFilter: 'blur(22px) saturate(160%) brightness(1.06)',
+  maskImage:
+    'linear-gradient(to bottom, black 0%, black 50%, transparent 50%, transparent 100%)',
+  WebkitMaskImage:
+    'linear-gradient(to bottom, black 0%, black 50%, transparent 50%, transparent 100%)',
+};
+
+const bottomEdgeStyle: CSSProperties = {
+  height: '100%',
+  transform: 'translateY(100%)',
+  background: 'color-mix(in srgb, hsl(var(--foreground)) 4%, transparent)',
+  backdropFilter: 'blur(16px) brightness(180%) saturate(130%) contrast(110%)',
+  WebkitBackdropFilter:
+    'blur(16px) brightness(180%) saturate(130%) contrast(110%)',
+  pointerEvents: 'none',
+  maskImage: 'linear-gradient(to bottom, black 0, black 1px, transparent 1px)',
+  WebkitMaskImage:
+    'linear-gradient(to bottom, black 0, black 1px, transparent 1px)',
+};
+
+const topEdgeStyle: CSSProperties = {
+  opacity: 0.7,
+  backdropFilter: 'blur(16px) saturate(250%) brightness(200%) contrast(120%)',
+  WebkitBackdropFilter:
+    'blur(16px) saturate(250%) brightness(200%) contrast(120%)',
+  maskImage:
+    'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+  WebkitMaskImage:
+    'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+  filter: 'blur(0.25px)',
+};
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
-    <header
-      className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-all duration-300',
-        scrolled
-          ? 'border-b border-panel backdrop-blur-xl bg-paper/80'
-          : 'bg-transparent',
-      )}
-    >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center group" aria-label="FocusFu home">
-          {/* Light mode: navy lockup; dark mode: white lockup. Use two <Image>s
-              swapped via Tailwind dark: variants so theming is automatic. */}
-          <Image
-            src="/focusfu-lockup-navy.svg"
-            alt="FocusFu"
-            width={808}
-            height={270}
-            priority
-            className="h-7 w-auto block dark:hidden"
-          />
-          <Image
-            src="/focusfu-lockup-white.svg"
-            alt="FocusFu"
-            width={808}
-            height={270}
-            priority
-            className="h-7 w-auto hidden dark:block"
-          />
-        </Link>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-          <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-          <a href="#how" className="hover:text-foreground transition-colors">How it works</a>
-          <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
-        </nav>
-        <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-50">
+      <div className="relative">
+        <div
+          className="pointer-events-none absolute inset-0 z-0"
+          style={backdropStyle}
+        />
+
+        <div className="relative z-10 mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
           <Link
-            href="/login"
-            className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors"
+            href="/"
+            className="flex items-center gap-2.5 group"
+            aria-label="FocusFu home"
           >
-            Sign in
+            {/* Mark + wordmark rendered separately so the wordmark text
+                can be visibly larger than the F mark to its left. */}
+            <Image
+              src="/branding/mark.png"
+              alt=""
+              width={200}
+              height={224}
+              priority
+              className="h-9 w-auto transition-transform group-hover:scale-[1.04]"
+            />
+            <Image
+              src="/branding/wordmark-navy.svg"
+              alt="FocusFu"
+              width={800}
+              height={250}
+              priority
+              className="h-[2.6rem] w-auto block dark:hidden -ml-0.5"
+            />
+            <Image
+              src="/branding/wordmark-white.svg"
+              alt="FocusFu"
+              width={800}
+              height={250}
+              priority
+              className="h-[2.6rem] w-auto hidden dark:block -ml-0.5"
+            />
           </Link>
-          <Link
-            href="#download"
-            className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.98] shadow-sm"
-          >
-            Download
-          </Link>
+
+          <nav className="hidden md:flex items-center gap-1">
+            {[
+              { href: '#features', label: 'Features' },
+              { href: '#how', label: 'How it works' },
+              { href: '#pricing', label: 'Pricing' },
+              { href: '#faq', label: 'FAQ' },
+            ].map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-foreground"
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="#download"
+              className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.98] shadow-sm"
+            >
+              Download
+            </Link>
+          </div>
         </div>
+
+        {/* Hairline + top-edge highlight */}
+        <div
+          className="pointer-events-none absolute -top-px right-0 left-0 z-20 h-0.5"
+          style={topEdgeStyle}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-20"
+          style={bottomEdgeStyle}
+        />
       </div>
     </header>
   );

@@ -43,27 +43,38 @@ const FEATURES = [
 export function Features() {
   return (
     <section id="features" className="relative py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-6">
+      {/* Soft inner decoration — keeps the section visually connected to the
+          surrounding bg rather than walled off by a card border. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-brand-500/[0.06] via-transparent to-transparent"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-brand-500/[0.04] via-transparent to-transparent"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-6">
         <div className="max-w-2xl mb-16">
-          <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3">Built for flow</p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-            Tiny tool. <span className="text-gradient">Huge gear shift.</span>
+          <p className="text-sm font-semibold text-brand-700 dark:text-brand-300 mb-3 font-mono tracking-wider uppercase">
+            Built for flow
+          </p>
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+            Tiny tool.{' '}
+            <span className="text-gradient">Huge gear shift.</span>
           </h2>
           <p className="text-lg text-muted-foreground">
             macOS Spaces is the most underused productivity feature on your Mac. FocusFu makes it usable.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-panel rounded-3xl overflow-hidden border border-panel" style={{ background: 'hsl(var(--border))' }}>
-          {FEATURES.map(({ icon: Icon, title, body }) => (
-            <div
-              key={title}
-              className="relative p-7 bg-background hover:bg-gradient-to-br hover:from-brand-50 hover:to-white dark:hover:from-brand-950/40 dark:hover:to-black transition-colors group"
-            >
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500/15 to-accent-500/15 border border-brand-500/35 text-brand-600 dark:text-brand-300 mb-5 group-hover:scale-110 transition-transform">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+          {FEATURES.map(({ icon: Icon, title, body }, i) => (
+            <div key={title} className="relative group">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/15 to-accent-500/15 border border-brand-500/30 text-brand-700 dark:text-brand-300 mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform">
                 <Icon className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{title}</h3>
+              <h3 className="text-lg font-semibold mb-2 tracking-tight">{title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
             </div>
           ))}

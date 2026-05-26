@@ -19,7 +19,7 @@ export function Hero() {
 
   return (
     <section
-      className="relative overflow-x-clip pt-16 pb-20 sm:pt-20 sm:pb-28 lg:pt-24"
+      className="relative overflow-x-clip pt-6 pb-20 sm:pt-10 sm:pb-28 lg:pt-12"
       style={
         {
           ['--primary-rgb' as string]: '245, 158, 11',
@@ -38,7 +38,7 @@ export function Hero() {
       <InteractiveSpotlight className="-z-10" />
 
       <div className="relative mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] gap-10 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] gap-10 lg:gap-12 items-start lg:pt-4">
           {/* Copy column — sits above the visual cards so bleed never covers text */}
           <div className="relative max-w-2xl z-10">
             <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-paper border border-brand-500/30 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
