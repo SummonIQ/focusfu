@@ -41,21 +41,8 @@ const backdropStyle: CSSProperties = {
     'linear-gradient(to bottom, black 0%, black 50%, transparent 50%, transparent 100%)',
 };
 
-// Refraction band right at the bottom edge — exaggerated saturate +
-// contrast so the boundary line itself looks like a piece of glass
-// catching light off whatever is sliding underneath.
-const lensRefractionStyle: CSSProperties = {
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  bottom: 0,
-  height: 6,
-  transform: 'translateY(50%)',
-  backdropFilter: 'blur(2px) saturate(280%) brightness(1.3) contrast(1.18)',
-  WebkitBackdropFilter:
-    'blur(2px) saturate(280%) brightness(1.3) contrast(1.18)',
-  pointerEvents: 'none',
-};
+// (removed thick refraction band — the 1px hairline below carries the
+// edge cue.)
 
 const bottomEdgeStyle: CSSProperties = {
   height: '100%',
@@ -155,12 +142,11 @@ export function Header() {
           </div>
         </div>
 
-        {/* Lens refraction strip + hairline + top-edge highlight */}
+        {/* Hairline + top-edge highlight */}
         <div
           className="pointer-events-none absolute -top-px right-0 left-0 z-20 h-0.5"
           style={topEdgeStyle}
         />
-        <div style={lensRefractionStyle} />
         <div
           className="pointer-events-none absolute inset-0 z-20"
           style={bottomEdgeStyle}

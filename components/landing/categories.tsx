@@ -714,45 +714,53 @@ function KanbanWindow() {
       ],
     },
   ];
-  const accent = (c: 'rose' | 'amber' | 'emerald') =>
-    c === 'rose' ? 'bg-rose-400/35 border-rose-300/50' :
-    c === 'amber' ? 'bg-amber-400/35 border-amber-300/55' :
-    'bg-emerald-400/30 border-emerald-300/45';
+  // Real-card styling: rich gradient surface, accent left rail,
+  // pronounced rounded corners, drop shadow that lifts each item off
+  // the column background.
+  const cardSurface = (c: 'rose' | 'amber' | 'emerald') =>
+    c === 'rose'
+      ? 'bg-gradient-to-br from-rose-500/20 via-rose-400/10 to-rose-600/15 border-rose-300/35'
+      : c === 'amber'
+        ? 'bg-gradient-to-br from-amber-500/22 via-amber-400/10 to-amber-600/15 border-amber-300/45'
+        : 'bg-gradient-to-br from-emerald-500/18 via-emerald-400/10 to-emerald-600/12 border-emerald-300/30';
   const tagTone: Record<string, string> = {
-    eng: 'text-sky-200/85',
-    design: 'text-fuchsia-200/85',
-    web: 'text-cyan-200/85',
-    biz: 'text-amber-200/85',
-    ops: 'text-emerald-200/85',
-    docs: 'text-violet-200/85',
-    ux: 'text-rose-200/85',
+    eng: 'text-sky-200/85 bg-sky-500/10',
+    design: 'text-fuchsia-200/85 bg-fuchsia-500/10',
+    web: 'text-cyan-200/85 bg-cyan-500/10',
+    biz: 'text-amber-200/85 bg-amber-500/10',
+    ops: 'text-emerald-200/85 bg-emerald-500/10',
+    docs: 'text-violet-200/85 bg-violet-500/10',
+    ux: 'text-rose-200/85 bg-rose-500/10',
   };
   return (
-    <div className="grid grid-cols-3 gap-1 h-full w-full">
+    <div className="grid grid-cols-3 gap-1.5 h-full w-full">
       {cols.map((col) => (
-        <div key={col.title} className="rounded-md bg-white/[0.05] border border-white/10 p-1.5 flex flex-col min-h-0">
-          <div className="flex items-center justify-between mb-1 shrink-0">
-            <span className="text-[8px] font-mono text-violet-100/90">{col.title}</span>
-            <span className="text-[8px] font-mono text-violet-200/55">{col.count}</span>
+        <div key={col.title} className="rounded-md bg-white/[0.04] border border-white/10 p-2 flex flex-col min-h-0">
+          <div className="flex items-center justify-between mb-1.5 shrink-0">
+            <span className="text-[9px] font-mono text-violet-100/90 font-semibold">{col.title}</span>
+            <span className="text-[8px] font-mono text-violet-200/60 bg-white/5 rounded px-1">{col.count}</span>
           </div>
-          <div className="space-y-[3px] overflow-hidden flex-1">
+          <div className="space-y-1.5 overflow-hidden flex-1">
             {col.items.map((it, i) => (
               <div
                 key={i}
-                className={cn('rounded-sm border px-1 py-[2px] flex items-center gap-1', accent(col.color))}
+                className={cn(
+                  'rounded-md border px-1.5 py-1 flex items-center gap-1 shadow-sm shadow-black/30 backdrop-blur-[2px]',
+                  cardSurface(col.color),
+                )}
               >
                 {it.p && (
                   <span className={cn(
-                    'h-1 w-1 rounded-full shrink-0',
-                    it.p === 1 ? 'bg-rose-300' : it.p === 2 ? 'bg-amber-300' : 'bg-emerald-300'
+                    'h-1.5 w-1.5 rounded-full shrink-0 shadow',
+                    it.p === 1 ? 'bg-rose-300 shadow-rose-300/40' : it.p === 2 ? 'bg-amber-300 shadow-amber-300/40' : 'bg-emerald-300 shadow-emerald-300/40'
                   )} />
                 )}
-                <span className="text-[6.5px] font-mono text-white/85 truncate flex-1">{it.t}</span>
-                <span className={cn('text-[6px] font-mono shrink-0', tagTone[it.tag] ?? 'text-white/55')}>
+                <span className="text-[7px] font-mono text-white/90 truncate flex-1">{it.t}</span>
+                <span className={cn('text-[6px] font-mono shrink-0 rounded-sm px-1 border border-white/10', tagTone[it.tag] ?? 'text-white/55 bg-white/5')}>
                   {it.tag}
                 </span>
                 {it.who && (
-                  <span className="text-[6px] font-mono text-white/70 bg-white/10 rounded-sm px-[2px] shrink-0">
+                  <span className="text-[6px] font-mono text-white/85 bg-gradient-to-br from-violet-500/40 to-fuchsia-500/40 rounded-full px-1 shrink-0 border border-white/15">
                     {it.who}
                   </span>
                 )}

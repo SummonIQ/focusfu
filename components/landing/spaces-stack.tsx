@@ -83,7 +83,7 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
     <motion.div
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      className="relative h-[600px] sm:h-[700px] lg:h-[820px] w-full select-none -mt-20 lg:ml-8"
+      className="relative h-[600px] sm:h-[700px] lg:h-[820px] w-full select-none -mt-[68px] lg:ml-8"
       style={{ perspective: 1600 }}
     >
       <motion.div
