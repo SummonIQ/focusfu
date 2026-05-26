@@ -268,27 +268,30 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={current.id}
+            // Shadow snaps in fast (like a contact shadow at the moment
+            // of impact) and diffuses briefly during the platform's
+            // compress-spring before resettling.
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: landing ? 0.6 : 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
+            transition={{
+              opacity: { duration: landing ? 0.12 : 0.14, delay: 0 },
+            }}
             className="font-bold tracking-tight whitespace-nowrap"
             style={{
               position: 'absolute',
               left: PLATFORM_OVERHANG,
               bottom: '100%',
-              // Skew the cast shadow so it reads as cast from an off-axis
-              // light source onto the tilted platform — not a flat dupe.
-              // Uniform skew — reads cleaner than the per-letter
-              // fan-out experiment.
-              transform: 'translateY(0.36em) skewX(-22deg)',
+              // No skewX — each letter's shadow sits directly under its
+              // glyph instead of drifting sideways.
+              transform: 'translateY(0.34em)',
               transformOrigin: 'left bottom',
               backgroundImage:
-                'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 88%, rgba(0,0,0,0.74) 100%)',
+                'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 88%, rgba(0,0,0,0.78) 100%)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               color: 'transparent',
-              filter: 'blur(0.6px)',
+              filter: landing ? 'blur(1.4px)' : 'blur(0.55px)',
             }}
           >
             {current.label}
