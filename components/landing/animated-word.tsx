@@ -75,13 +75,13 @@ const EXIT = {
   },
 } as unknown as TargetAndTransition;
 
-// Tighter spring (more damping, slightly less stiffness) so the incoming
-// label settles cleanly without overshoot. Delay keeps the outgoing word
+// Springy landing — damping 15 keeps a small overshoot so the new label
+// "bounces" lightly off the platform. Delay keeps the outgoing word
 // mid-fall when the new one drops in.
 const TRANSITION = {
-  y: { type: 'spring', stiffness: 340, damping: 20, mass: 1, delay: 0.14 },
-  opacity: { duration: 0.26, delay: 0.14 },
-  scale: { duration: 0.38, delay: 0.14 },
+  y: { type: 'spring', stiffness: 360, damping: 15, mass: 1, delay: 0.12 },
+  opacity: { duration: 0.24, delay: 0.12 },
+  scale: { duration: 0.36, delay: 0.12 },
   filter: { duration: 0.4 },
 } as unknown as Transition;
 
@@ -157,11 +157,12 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
     return () => ro.disconnect();
   }, [activeIndex, maxWidth]);
 
-  // Word arrives at platform around: delay(140ms) + spring-rise(~240ms)
-  // → land at ~380ms. Compress-spring fires there.
+  // Word arrives at platform around: delay(120ms) + spring-rise(~210ms)
+  // → land at ~330ms. Compress-spring fires *exactly* when the word
+  // contacts the slab, not after.
   useEffect(() => {
-    const t1 = setTimeout(() => setLanding(true), 380);
-    const t2 = setTimeout(() => setLanding(false), 510);
+    const t1 = setTimeout(() => setLanding(true), 330);
+    const t2 = setTimeout(() => setLanding(false), 470);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -305,6 +306,14 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           exit={EXIT}
           transition={TRANSITION}
           className="absolute left-0 top-0 font-bold tracking-tight whitespace-nowrap z-[3]"
+          style={{
+            // Emboss the glyphs: dark drop below + light rim above.
+            // Stacked drop-shadows respect the glyph alpha so the
+            // result hugs each letter shape rather than the bounding
+            // box.
+            filter:
+              'drop-shadow(0 1px 0 rgba(0,0,0,0.35)) drop-shadow(0 -0.5px 0 rgba(255,255,255,0.18)) drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
+          }}
         >
           <PerCharGradientLabel text={current.label} />
         </motion.span>
