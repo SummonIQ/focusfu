@@ -83,7 +83,7 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
     <motion.div
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      className="relative h-[460px] sm:h-[540px] lg:h-[620px] w-full select-none"
+      className="relative h-[600px] sm:h-[700px] lg:h-[820px] w-full select-none"
       style={{ perspective: 1600 }}
     >
       <motion.div
@@ -99,8 +99,8 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
-                width: '70%',
-                maxWidth: 540,
+                width: '88%',
+                maxWidth: 720,
                 transform: `translate(-50%, -50%) translate3d(${slot.x}, ${slot.y}, ${slot.z}px) rotateZ(${slot.rotateZ}deg) scale(${slot.scale})`,
                 transformStyle: 'preserve-3d',
                 zIndex: slot.zIndex,
