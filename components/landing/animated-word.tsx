@@ -54,30 +54,31 @@ const ANIMATE = {
 } as unknown as TargetAndTransition;
 
 const EXIT = {
-  y: ['0em', '0.4em', '1em', '1.8em', '2.6em'],
-  opacity: [1, 1, 0.85, 0.4, 0],
-  scale: [1, 0.98, 0.9, 0.74, 0.55],
+  y: ['0em', '0.45em', '1.1em', '1.9em', '2.6em'],
+  opacity: [1, 1, 0.78, 0.3, 0],
+  scale: [1, 0.98, 0.9, 0.72, 0.54],
   filter: [
     'blur(0px)',
     'blur(1px)',
-    'blur(5px)',
-    'blur(16px)',
-    'blur(34px)',
+    'blur(6px)',
+    'blur(18px)',
+    'blur(36px)',
   ],
-  '--mask-stop': ['100%', '60%', '18%', '0%', '0%'],
+  '--mask-stop': ['100%', '54%', '14%', '0%', '0%'],
   transition: {
-    duration: 1.1,
-    times: [0, 0.22, 0.5, 0.78, 1],
-    ease: [0.45, 0, 0.7, 1],
+    duration: 0.78,
+    times: [0, 0.22, 0.48, 0.76, 1],
+    ease: [0.4, 0, 0.7, 1],
   },
 } as unknown as TargetAndTransition;
 
-// Delaying the incoming word means the outgoing word is mid-fall when
-// the new one drops in — the new label visually pushes the old through.
+// Tighter spring (more damping, slightly less stiffness) so the incoming
+// label settles cleanly without overshoot. Delay keeps the outgoing word
+// mid-fall when the new one drops in.
 const TRANSITION = {
-  y: { type: 'spring', stiffness: 380, damping: 16, mass: 1, delay: 0.18 },
-  opacity: { duration: 0.28, delay: 0.18 },
-  scale: { duration: 0.4, delay: 0.18 },
+  y: { type: 'spring', stiffness: 340, damping: 20, mass: 1, delay: 0.14 },
+  opacity: { duration: 0.26, delay: 0.14 },
+  scale: { duration: 0.38, delay: 0.14 },
   filter: { duration: 0.4 },
 } as unknown as Transition;
 
@@ -118,10 +119,11 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
     return () => ro.disconnect();
   }, [activeIndex, maxWidth]);
 
-  // Compress-spring fires when incoming word arrives; account for entry delay
+  // Word arrives at platform around: delay(140ms) + spring-rise(~240ms)
+  // → land at ~380ms. Compress-spring fires there.
   useEffect(() => {
-    const t1 = setTimeout(() => setLanding(true), 440);
-    const t2 = setTimeout(() => setLanding(false), 580);
+    const t1 = setTimeout(() => setLanding(true), 380);
+    const t2 = setTimeout(() => setLanding(false), 510);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -187,14 +189,17 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.18em',
+          bottom: '-0.08em',
           height: '0.52em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           background:
             'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.34), rgba(var(--stage-rgb), 0.7))',
+          // 0 4px 0 darker = a slim bottom face that reads as platform
+          // thickness once the slab is tilted; the longer-blur shadow
+          // sits below that for ambient occlusion.
           boxShadow:
-            '0 10px 22px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)',
+            '0 4px 0 rgba(var(--stage-rgb), 0.85), 0 12px 22px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.22)',
         }}
         animate={platformAnimate}
         transition={platformTransition}
@@ -209,11 +214,14 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute pointer-events-none z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.18em',
+          bottom: '-0.08em',
           height: '0.52em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           overflow: 'hidden',
+          // Match the platform's apparent thickness so the shadow region
+          // sits on the top face, not the side face.
+          marginBottom: 0,
         }}
         animate={platformAnimate}
         transition={platformTransition}
