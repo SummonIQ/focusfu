@@ -230,9 +230,12 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG_LEFT}px`,
-          // Platform top sits just below descender ends so g/p/y/j
-          // never get clipped by the slab.
-          bottom: '-0.34em',
+          // Accounting for the rotateX(52deg) foreshortening: the
+          // platform's visible top lands ~0.17em above its CSS bottom
+          // position. -0.16em puts the visible top right at the
+          // descender ends — letters sit flush on the slab, no gap,
+          // no clipped g/p/y.
+          bottom: '-0.16em',
           height: '0.46em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
@@ -257,9 +260,12 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute pointer-events-none z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG_LEFT}px`,
-          // Platform top sits just below descender ends so g/p/y/j
-          // never get clipped by the slab.
-          bottom: '-0.34em',
+          // Accounting for the rotateX(52deg) foreshortening: the
+          // platform's visible top lands ~0.17em above its CSS bottom
+          // position. -0.16em puts the visible top right at the
+          // descender ends — letters sit flush on the slab, no gap,
+          // no clipped g/p/y.
+          bottom: '-0.16em',
           height: '0.46em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
