@@ -4,6 +4,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { type CSSProperties } from 'react';
 
+const markMaskStyle: CSSProperties = {
+  height: 28,
+  width: 25,
+  maskImage: 'url(/branding/mark.png)',
+  WebkitMaskImage: 'url(/branding/mark.png)',
+  maskSize: 'contain',
+  WebkitMaskSize: 'contain',
+  maskRepeat: 'no-repeat',
+  WebkitMaskRepeat: 'no-repeat',
+  maskPosition: 'center',
+  WebkitMaskPosition: 'center',
+};
+
 /**
  * Frosted-glass header inspired by bizfoo: a 200%-tall backdrop with a
  * vertical mask that fades to transparent, plus a 1px bottom hairline and
@@ -63,13 +76,12 @@ export function Header() {
             className="flex items-center gap-2 group"
             aria-label="FocusFu home"
           >
-            <Image
-              src="/branding/mark.png"
-              alt=""
-              width={200}
-              height={224}
-              priority
-              className="h-7 w-auto transition-transform group-hover:scale-[1.05]"
+            {/* F mark — PNG used as a CSS mask so the silhouette picks up
+                the site's brand color (amber light / amber-dark variant). */}
+            <span
+              aria-hidden
+              className="block bg-brand-600 dark:bg-brand-400 transition-transform group-hover:scale-[1.05]"
+              style={markMaskStyle}
             />
             <Image
               src="/branding/wordmark-navy.svg"

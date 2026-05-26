@@ -19,7 +19,7 @@ export function Hero() {
 
   return (
     <section
-      className="relative overflow-x-clip pt-6 pb-20 sm:pt-10 sm:pb-28 lg:pt-12"
+      className="relative overflow-x-clip pt-12 pb-20 sm:pt-16 sm:pb-28 lg:pt-[4.5rem]"
       style={
         {
           ['--primary-rgb' as string]: '245, 158, 11',
