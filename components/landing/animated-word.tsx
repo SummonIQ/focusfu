@@ -53,16 +53,19 @@ const ANIMATE = {
   '--mask-stop': '100%',
 } as unknown as TargetAndTransition;
 
+// Disintegrate runs concurrently with the brand→stone mask sweep —
+// blur, scale-down and opacity fade ramp from the same keyframe the
+// color shift begins, so the word visibly comes apart AS it turns gray.
 const EXIT = {
   y: ['0em', '0.45em', '1.1em', '1.9em', '2.6em'],
-  opacity: [1, 1, 0.78, 0.3, 0],
-  scale: [1, 0.98, 0.9, 0.72, 0.54],
+  opacity: [1, 0.92, 0.7, 0.32, 0],
+  scale: [1, 0.96, 0.84, 0.68, 0.5],
   filter: [
     'blur(0px)',
-    'blur(1px)',
-    'blur(6px)',
-    'blur(18px)',
-    'blur(36px)',
+    'blur(2.5px)',
+    'blur(9px)',
+    'blur(22px)',
+    'blur(40px)',
   ],
   '--mask-stop': ['100%', '54%', '14%', '0%', '0%'],
   transition: {
@@ -113,40 +116,6 @@ function PerCharGradientLabel({ text }: { text: string }) {
           {char}
         </span>
       ))}
-    </>
-  );
-}
-
-/**
- * Per-character skew for the cast shadow. Letters near the centre stay
- * nearly vertical; letters at the ends fan INWARD (left edge tilts right,
- * right edge tilts left). Quadratic falloff keeps the middle clean and
- * ramps to full skew only at the outermost characters.
- */
-function SkewedShadow({ text, maxSkew = 22 }: { text: string; maxSkew?: number }) {
-  const chars = Array.from(text);
-  const lastIdx = chars.length - 1;
-  const center = Math.max(lastIdx / 2, 1);
-  return (
-    <>
-      {chars.map((char, i) => {
-        const offset = (i - lastIdx / 2) / center; // -1..1
-        const intensity = offset * Math.abs(offset); // quadratic, signed
-        const skew = -intensity * maxSkew;
-        return (
-          <span
-            key={`${i}-${char}`}
-            style={{
-              display: 'inline-block',
-              transform: `skewX(${skew}deg)`,
-              transformOrigin: 'bottom center',
-              whiteSpace: 'pre',
-            }}
-          >
-            {char}
-          </span>
-        );
-      })}
     </>
   );
 }
@@ -266,9 +235,9 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
             'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.34), rgba(var(--stage-rgb), 0.7))',
           // 0 4px 0 darker = a slim bottom face that reads as platform
           // thickness once the slab is tilted; the longer-blur shadow
-          // sits below that for ambient occlusion.
+          // sits below that for ambient occlusion. No top highlight.
           boxShadow:
-            '0 4px 0 rgba(var(--stage-rgb), 0.85), 0 12px 22px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.22)',
+            '0 4px 0 rgba(var(--stage-rgb), 0.85), 0 12px 22px -8px rgba(0,0,0,0.6)',
         }}
         animate={platformAnimate}
         transition={platformTransition}
@@ -309,7 +278,9 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
               bottom: '100%',
               // Skew the cast shadow so it reads as cast from an off-axis
               // light source onto the tilted platform — not a flat dupe.
-              transform: 'translateY(0.36em)',
+              // Uniform skew — reads cleaner than the per-letter
+              // fan-out experiment.
+              transform: 'translateY(0.36em) skewX(-22deg)',
               transformOrigin: 'left bottom',
               backgroundImage:
                 'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 88%, rgba(0,0,0,0.74) 100%)',
@@ -319,7 +290,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
               filter: 'blur(0.6px)',
             }}
           >
-            <SkewedShadow text={current.label} />
+            {current.label}
           </motion.span>
         </AnimatePresence>
       </motion.div>
