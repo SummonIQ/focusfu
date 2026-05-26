@@ -82,6 +82,40 @@ const TRANSITION = {
   filter: { duration: 0.4 },
 } as unknown as Transition;
 
+/**
+ * Per-character skew for the cast shadow. Letters near the centre stay
+ * nearly vertical; letters at the ends fan INWARD (left edge tilts right,
+ * right edge tilts left). Quadratic falloff keeps the middle clean and
+ * ramps to full skew only at the outermost characters.
+ */
+function SkewedShadow({ text, maxSkew = 22 }: { text: string; maxSkew?: number }) {
+  const chars = Array.from(text);
+  const lastIdx = chars.length - 1;
+  const center = Math.max(lastIdx / 2, 1);
+  return (
+    <>
+      {chars.map((char, i) => {
+        const offset = (i - lastIdx / 2) / center; // -1..1
+        const intensity = offset * Math.abs(offset); // quadratic, signed
+        const skew = -intensity * maxSkew;
+        return (
+          <span
+            key={`${i}-${char}`}
+            style={{
+              display: 'inline-block',
+              transform: `skewX(${skew}deg)`,
+              transformOrigin: 'bottom center',
+              whiteSpace: 'pre',
+            }}
+          >
+            {char}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
 export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
   const current = CATEGORIES[activeIndex];
   const probesRef = useRef<HTMLSpanElement | null>(null);
@@ -240,7 +274,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
               bottom: '100%',
               // Skew the cast shadow so it reads as cast from an off-axis
               // light source onto the tilted platform — not a flat dupe.
-              transform: 'translateY(0.36em) skewX(-22deg)',
+              transform: 'translateY(0.36em)',
               transformOrigin: 'left bottom',
               backgroundImage:
                 'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 88%, rgba(0,0,0,0.74) 100%)',
