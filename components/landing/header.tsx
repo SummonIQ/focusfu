@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/css';
@@ -24,9 +25,25 @@ export function Header() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2 group">
-          <Logo />
-          <span className="font-semibold tracking-tight text-lg">FocusFu</span>
+        <Link href="/" className="flex items-center group" aria-label="FocusFu home">
+          {/* Light mode: navy lockup; dark mode: white lockup. Use two <Image>s
+              swapped via Tailwind dark: variants so theming is automatic. */}
+          <Image
+            src="/focusfu-lockup-navy.svg"
+            alt="FocusFu"
+            width={808}
+            height={270}
+            priority
+            className="h-7 w-auto block dark:hidden"
+          />
+          <Image
+            src="/focusfu-lockup-white.svg"
+            alt="FocusFu"
+            width={808}
+            height={270}
+            priority
+            className="h-7 w-auto hidden dark:block"
+          />
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition-colors">Features</a>
@@ -49,14 +66,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  );
-}
-
-function Logo() {
-  return (
-    <span className="relative inline-flex items-center justify-center h-8 w-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 shadow-lg shadow-brand-500/30 transition-transform group-hover:rotate-12">
-      <span className="absolute inset-1 rounded-md bg-white/20 backdrop-blur" />
-      <span className="relative text-white text-xs font-bold tracking-tight">F</span>
-    </span>
   );
 }

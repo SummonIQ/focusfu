@@ -16,23 +16,31 @@ export const metadata: Metadata = {
     url: 'https://focusfu.com',
     siteName: 'FocusFu',
     type: 'website',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'FocusFu' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'FocusFu — Master Your macOS Workspace',
     description: 'Lightning-fast macOS workspace switching, built for focus.',
+    images: ['/og-image.png'],
   },
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
+  manifest: '/site.webmanifest',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a1a' },
+    { media: '(prefers-color-scheme: light)', color: '#fafaf3' },
+    { media: '(prefers-color-scheme: dark)', color: '#070E25' },
   ],
 };
 
