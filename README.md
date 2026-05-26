@@ -18,7 +18,7 @@ Lightning-fast macOS workspace switching. Keyboard-first, visual, built for focu
 bun install
 cp .env.example .env.local   # fill in
 bun run db:push
-bun run dev                  # http://localhost:3030
+bun run dev                  # http://localhost:30240
 ```
 
 In another terminal, forward Stripe webhooks:

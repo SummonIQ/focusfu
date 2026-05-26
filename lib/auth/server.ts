@@ -5,7 +5,7 @@ import { db } from '@/lib/db/client';
 const baseURL =
   process.env.NODE_ENV === 'production'
     ? process.env.BETTER_AUTH_URL || 'https://focusfu.com'
-    : `http://localhost:${process.env.PORT ?? '3030'}`;
+    : `http://localhost:${process.env.PORT ?? '30240'}`;
 
 export const auth = betterAuth({
   appName: 'FocusFu',

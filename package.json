@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "bun@1.2.21",
   "scripts": {
-    "dev": "next dev --turbopack --port 3030",
+    "dev": "next dev --turbopack --port 30240",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
@@ -12,7 +12,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "stripe:listen": "stripe listen --forward-to localhost:3030/api/stripe/webhook"
+    "stripe:listen": "stripe listen --forward-to localhost:30240/api/stripe/webhook"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.2",
