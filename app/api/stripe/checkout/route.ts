@@ -11,11 +11,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  const body = await request.json().catch(() => ({}));
-  const interval = (body.interval ?? 'monthly') as BillingInterval;
+  // Lifetime-only product right now.
+  const interval: BillingInterval = 'lifetime';
   const priceId = getPriceId(interval);
   if (!priceId) {
-    return NextResponse.json({ error: 'Invalid interval' }, { status: 400 });
+    return NextResponse.json({ error: 'Price not configured' }, { status: 500 });
   }
 
   const user = await db.user.findUnique({ where: { id: session.user.id } });
@@ -32,12 +32,11 @@ export async function POST(request: NextRequest) {
     await db.user.update({ where: { id: user.id }, data: { stripeCustomerId: customerId } });
   }
 
-  const isLifetime = interval === 'lifetime';
   const origin = request.headers.get('origin') ?? 'https://focusfu.com';
 
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: customerId,
-    mode: isLifetime ? 'payment' : 'subscription',
+    mode: 'payment',
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/pricing`,

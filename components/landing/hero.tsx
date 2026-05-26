@@ -1,95 +1,106 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check, Download } from 'lucide-react';
 import { InteractiveSpotlight } from './interactive-spotlight';
 import { AnimatedWord } from './animated-word';
 import { SpacesStack } from './spaces-stack';
+import { CATEGORIES } from './categories';
 
 export function Hero() {
+  // Single source of truth for word + windows
+  const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % CATEGORIES.length);
+    }, 2800);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <section
-      className="relative overflow-hidden pt-32 pb-24 sm:pt-40 sm:pb-32"
+      className="relative overflow-x-clip pt-28 pb-20 sm:pt-36 sm:pb-28"
       style={
         {
-          ['--primary-rgb' as string]: '99, 102, 241',
-          ['--primary-glow' as string]: '167, 139, 250',
+          ['--primary-rgb' as string]: '245, 158, 11',
+          ['--primary-glow' as string]: '251, 113, 133',
         } as React.CSSProperties
       }
     >
-      {/* Layered background */}
-      <div className="absolute inset-0 -z-30 bg-gradient-to-br from-brand-50 via-white to-accent-400/10 dark:from-brand-950 dark:via-black dark:to-accent-600/10" />
-      <div className="absolute inset-0 -z-20 bg-grid [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
+      {/* Layered background — cream/paper light, ink dark */}
+      <div className="absolute inset-0 -z-30 bg-paper" />
+      <div className="absolute inset-0 -z-20 bg-dots [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
 
-      {/* Animated blobs */}
+      {/* Warm ambient blobs */}
       <div aria-hidden className="absolute inset-0 -z-20 overflow-hidden">
-        <div className="absolute -top-32 -right-32 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-brand-400/30 to-accent-500/20 blur-3xl animate-[blob_12s_ease-in-out_infinite] dark:from-brand-600/30 dark:to-accent-600/20" />
-        <div className="absolute -bottom-40 -left-40 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-accent-500/25 to-brand-400/20 blur-3xl animate-[blob_14s_ease-in-out_infinite] [animation-delay:-4s] dark:from-accent-600/25 dark:to-brand-600/20" />
-        <div className="absolute top-1/2 left-1/3 h-[360px] w-[360px] -translate-y-1/2 rounded-full bg-gradient-to-br from-sky-400/20 to-brand-500/20 blur-3xl animate-[float_10s_ease-in-out_infinite] [animation-delay:-2s]" />
+        <div className="absolute -top-32 -right-32 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-brand-300/40 to-accent-400/25 blur-3xl animate-[blob_14s_ease-in-out_infinite] dark:from-brand-700/35 dark:to-accent-700/20" />
+        <div className="absolute -bottom-44 -left-44 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-accent-300/35 to-brand-400/25 blur-3xl animate-[blob_16s_ease-in-out_infinite] [animation-delay:-4s] dark:from-accent-700/30 dark:to-brand-700/20" />
       </div>
 
-      {/* Pointer-tracked spotlight (canvas) */}
+      {/* Pointer-tracked spotlight */}
       <InteractiveSpotlight className="-z-10" />
 
       <div className="relative mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: copy */}
-          <div className="relative">
-            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-white/60 dark:bg-white/5 border border-brand-500/15 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-10 lg:gap-14 items-center">
+          {/* Copy column */}
+          <div className="relative max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-paper border border-brand-500/20 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
                 <span className="relative inline-block h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-foreground/80">Public beta — macOS 12+</span>
+              <span className="text-foreground/80 font-mono">v0.9 beta · macOS 12+</span>
             </div>
 
-            <h1 className="text-[2.6rem] sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.02] mb-6">
-              <span className="text-foreground">Focus on</span>{' '}
-              <AnimatedWord />
-              <br />
-              <span className="text-gradient">in one keystroke.</span>
+            <h1 className="font-display text-[2.5rem] sm:text-5xl lg:text-[3.6rem] xl:text-[4.2rem] font-bold tracking-tight leading-[1.04] mb-7">
+              <span className="block text-foreground">Focus on</span>
+              <span className="block">
+                <AnimatedWord activeIndex={activeIndex} />
+              </span>
+              <span className="block text-foreground">in one keystroke.</span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-9 leading-relaxed">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-lg mb-9 leading-relaxed">
               FocusFu turns macOS Spaces into a calm, keyboard-first workspace.
-              Lightning previews. Per-space focus rules. Switch contexts in 1–2
-              seconds and never lose your flow.
+              Each space gets its own apps, its own rules, its own personality.
+              Switch contexts in 1&ndash;2 seconds and never lose your flow.
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-9">
               <Link
                 href="#download"
-                className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-foreground text-background px-6 py-3.5 text-sm font-semibold shadow-lg shadow-brand-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-ink-900 dark:bg-brand-500 text-white dark:text-ink-950 px-6 py-3.5 text-sm font-semibold shadow-[0_10px_30px_-10px_rgba(245,158,11,0.6)] transition-all hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-brand-500/0 via-brand-500/30 to-brand-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="absolute inset-0 bg-gradient-to-r from-brand-400/0 via-brand-200/40 to-brand-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <Download className="h-4 w-4" />
                 <span>Download for macOS</span>
               </Link>
               <Link
                 href="#pricing"
-                className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3.5 text-sm font-medium border border-foreground/10 bg-white/60 dark:bg-white/5 backdrop-blur-md hover:bg-white/80 dark:hover:bg-white/10 transition-all"
+                className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3.5 text-sm font-medium border border-foreground/15 bg-paper backdrop-blur-md hover:border-brand-500/40 transition-all"
               >
-                View pricing
+                See pricing
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <Bullet>Apple Silicon & Intel</Bullet>
+              <Bullet>Apple Silicon &amp; Intel</Bullet>
               <Bullet>Keyboard-first</Bullet>
-              <Bullet>Privacy-first, no telemetry</Bullet>
+              <Bullet>No telemetry, ever</Bullet>
             </ul>
           </div>
 
-          {/* Right: 3D stack */}
+          {/* Visual column — bigger, with bleed */}
           <div className="relative">
-            <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-brand-500/20 to-accent-500/20 blur-3xl -z-10" />
-            <SpacesStack />
+            <div className="absolute -inset-10 rounded-[2.5rem] bg-gradient-to-br from-brand-400/25 via-accent-400/20 to-brand-500/10 blur-3xl -z-10" />
+            <SpacesStack activeIndex={activeIndex} />
           </div>
         </div>
       </div>
 
-      {/* Fade-out to next section */}
+      {/* fade-out */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background" />
     </section>
   );

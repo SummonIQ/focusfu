@@ -1,74 +1,63 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/css';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { CATEGORIES } from './categories';
 
-const WORDS = [
-  'Code',
-  'Design',
-  'Writing',
-  'Music',
-  'Meetings',
-  'Research',
-  'Studying',
-  'Trading',
-  'Editing',
-  'Strategy',
-];
+interface AnimatedWordProps {
+  activeIndex: number;
+}
 
-export function AnimatedWord() {
-  const [index, setIndex] = useState(0);
-  const [prevIndex, setPrevIndex] = useState<number | null>(null);
-  const [width, setWidth] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
+/**
+ * Distinctive headline word — marker-highlighted underline (not a gradient pill).
+ * Width is reserved to the widest word so the headline never wraps/shifts.
+ */
+export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
+  const current = CATEGORIES[activeIndex];
 
+  // measure widest word once so we can reserve space and never reflow
+  const [maxWidth, setMaxWidth] = useState<number | null>(null);
   useEffect(() => {
-    const measure = () => {
-      if (!ref.current) return;
-      const active = ref.current.querySelector<HTMLElement>('[data-active="true"]');
-      if (active) setWidth(active.offsetWidth);
-    };
-    requestAnimationFrame(measure);
-  }, [index]);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setIndex((prev) => {
-        setPrevIndex(prev);
-        return (prev + 1) % WORDS.length;
-      });
-    }, 2400);
-    return () => clearInterval(id);
+    if (typeof document === 'undefined') return;
+    const probe = document.createElement('span');
+    probe.style.visibility = 'hidden';
+    probe.style.position = 'absolute';
+    probe.style.whiteSpace = 'nowrap';
+    probe.style.font = 'inherit';
+    probe.className = 'font-bold tracking-tight';
+    document.body.appendChild(probe);
+    let widest = 0;
+    for (const c of CATEGORIES) {
+      probe.textContent = c.label;
+      widest = Math.max(widest, probe.offsetWidth);
+    }
+    document.body.removeChild(probe);
+    setMaxWidth(widest);
   }, []);
 
   return (
-    <span className="inline-flex items-baseline align-baseline">
-      <motion.span
-        className="relative inline-flex items-center justify-center px-4 py-1 rounded-xl border border-brand-500/30 bg-gradient-to-br from-brand-500/10 to-accent-500/10 backdrop-blur-sm shadow-sm shadow-brand-500/10"
-        style={{ boxSizing: 'content-box' }}
-        animate={{ width: width > 0 ? width : 'auto' }}
-        transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-      >
-        <span ref={ref} className="relative inline-block" style={{ height: '1.1em' }}>
-          {WORDS.map((word, i) => (
-            <span
-              key={word}
-              data-active={i === index}
-              className={cn(
-                'absolute left-1/2 -translate-x-1/2 top-0 whitespace-nowrap text-gradient font-semibold transition-all duration-500 ease-out',
-                i === index
-                  ? 'opacity-100 translate-y-0 scale-100'
-                  : i === prevIndex
-                    ? 'opacity-0 translate-y-full scale-90'
-                    : 'opacity-0 -translate-y-full scale-90',
-              )}
-            >
-              {word}
-            </span>
-          ))}
-        </span>
-      </motion.span>
+    <span
+      className="relative inline-flex items-baseline justify-center align-baseline overflow-visible"
+      style={{
+        minWidth: maxWidth ? `${maxWidth + 16}px` : undefined,
+        height: '1.05em',
+      }}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={current.id}
+          initial={{ y: '0.6em', opacity: 0, filter: 'blur(6px)' }}
+          animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+          exit={{ y: '-0.55em', opacity: 0, filter: 'blur(6px)' }}
+          transition={{ duration: 0.42, ease: [0.25, 0.8, 0.25, 1] }}
+          className="relative inline-flex items-baseline"
+        >
+          <span className="marker-bg px-2 -mx-1 rounded-[2px] font-bold tracking-tight text-brand-700 dark:text-brand-300">
+            {current.label}
+          </span>
+        </motion.span>
+      </AnimatePresence>
+      <span className="caret text-brand-600 dark:text-brand-300" aria-hidden />
     </span>
   );
 }

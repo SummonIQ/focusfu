@@ -1,51 +1,67 @@
 @import 'tailwindcss';
 
+/* FocusFu — warm amber + coral on cream/ink. Distinct from gimme-job's purple. */
+
 @theme {
-  --color-brand-50: oklch(0.975 0.013 250);
-  --color-brand-100: oklch(0.945 0.03 250);
-  --color-brand-200: oklch(0.88 0.07 252);
-  --color-brand-300: oklch(0.795 0.12 254);
-  --color-brand-400: oklch(0.7 0.165 256);
-  --color-brand-500: oklch(0.625 0.205 258);
-  --color-brand-600: oklch(0.55 0.215 260);
-  --color-brand-700: oklch(0.47 0.195 262);
-  --color-brand-800: oklch(0.39 0.165 264);
-  --color-brand-900: oklch(0.31 0.13 266);
-  --color-brand-950: oklch(0.21 0.09 268);
+  /* Primary: warm amber (golden hour, "focused work session") */
+  --color-brand-50: oklch(0.985 0.012 75);
+  --color-brand-100: oklch(0.96 0.04 75);
+  --color-brand-200: oklch(0.92 0.085 73);
+  --color-brand-300: oklch(0.875 0.13 72);
+  --color-brand-400: oklch(0.83 0.16 68);
+  --color-brand-500: oklch(0.78 0.165 62);
+  --color-brand-600: oklch(0.7 0.17 55);
+  --color-brand-700: oklch(0.6 0.155 48);
+  --color-brand-800: oklch(0.49 0.13 44);
+  --color-brand-900: oklch(0.38 0.1 42);
+  --color-brand-950: oklch(0.24 0.07 42);
 
-  --color-accent-400: oklch(0.78 0.18 320);
-  --color-accent-500: oklch(0.7 0.21 320);
-  --color-accent-600: oklch(0.62 0.22 320);
+  /* Accent: coral / sunset rose */
+  --color-accent-300: oklch(0.84 0.13 25);
+  --color-accent-400: oklch(0.78 0.16 22);
+  --color-accent-500: oklch(0.71 0.19 20);
+  --color-accent-600: oklch(0.62 0.2 18);
+  --color-accent-700: oklch(0.52 0.18 16);
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+  /* Ink: deep cool charcoal for type & dark mode bg */
+  --color-ink-50: oklch(0.97 0.005 260);
+  --color-ink-100: oklch(0.93 0.008 260);
+  --color-ink-300: oklch(0.74 0.015 260);
+  --color-ink-500: oklch(0.5 0.02 265);
+  --color-ink-700: oklch(0.3 0.025 270);
+  --color-ink-900: oklch(0.16 0.022 270);
+  --color-ink-950: oklch(0.1 0.018 270);
 
-  --animate-blob: blob 12s ease-in-out infinite;
-  --animate-float: float 8s ease-in-out infinite;
-  --animate-shimmer: shimmer 2.5s linear infinite;
-  --animate-pulse-slow: pulse 8s ease-in-out infinite;
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', sans-serif;
+  --font-display:
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'SF Pro Display', sans-serif;
+  --font-mono:
+    ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Monaco, monospace;
 }
 
 @layer base {
   :root {
-    --background: 250 100% 99%;
-    --foreground: 230 30% 8%;
-    --muted: 230 20% 96%;
-    --muted-foreground: 230 12% 42%;
-    --border: 230 25% 90%;
-    --primary-rgb: 99, 102, 241;
-    --primary-glow: 167, 139, 250;
+    --background: 42 30% 97%;       /* cream */
+    --foreground: 260 18% 14%;
+    --muted: 42 15% 92%;
+    --muted-foreground: 260 8% 42%;
+    --border: 42 14% 86%;
+    --paper: 40 40% 99%;
+    --primary-rgb: 245, 158, 11;    /* amber-500-ish for canvas glow */
+    --primary-glow: 251, 113, 133;  /* coral */
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --background: 230 35% 5%;
-      --foreground: 240 25% 96%;
-      --muted: 230 25% 12%;
-      --muted-foreground: 230 15% 65%;
-      --border: 230 25% 18%;
-      --primary-rgb: 139, 134, 255;
-      --primary-glow: 196, 167, 255;
+      --background: 260 22% 6%;     /* deep ink */
+      --foreground: 42 25% 96%;
+      --muted: 260 18% 11%;
+      --muted-foreground: 260 10% 65%;
+      --border: 260 16% 16%;
+      --paper: 260 20% 8%;
+      --primary-rgb: 252, 184, 64;
+      --primary-glow: 255, 138, 138;
     }
   }
 
@@ -64,29 +80,85 @@
   }
 
   ::selection {
-    background: rgba(var(--primary-rgb), 0.25);
+    background: rgba(var(--primary-rgb), 0.28);
+    color: hsl(var(--foreground));
+  }
+}
+
+/* Marker highlight under the rotating word — distinctive vs gimme-job's gradient pill */
+.marker-bg {
+  background: linear-gradient(
+    180deg,
+    transparent 55%,
+    rgba(var(--primary-rgb), 0.32) 55%,
+    rgba(var(--primary-rgb), 0.32) 100%
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  .marker-bg {
+    background: linear-gradient(
+      180deg,
+      transparent 55%,
+      rgba(var(--primary-rgb), 0.22) 55%,
+      rgba(var(--primary-rgb), 0.22) 100%
+    );
+  }
+}
+
+/* Subtle "paper" grain texture — feels analog & focused */
+.bg-paper {
+  background-color: hsl(var(--paper));
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.025) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-paper {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.035) 1px, transparent 0);
+  }
+}
+
+/* Subtle dotted grid — replaces grid lines from gimme-job */
+.bg-dots {
+  background-image:
+    radial-gradient(circle, rgba(var(--primary-rgb), 0.13) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-dots {
+    background-image:
+      radial-gradient(circle, rgba(var(--primary-rgb), 0.1) 1px, transparent 1px);
   }
 }
 
 @keyframes blob {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -60px) scale(1.1); }
-  66% { transform: translate(-30px, 40px) scale(0.95); }
+  33% { transform: translate(40px, -50px) scale(1.08); }
+  66% { transform: translate(-30px, 30px) scale(0.95); }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0) translateX(0); }
-  50% { transform: translateY(-30px) translateX(15px); }
+  50% { transform: translateY(-28px) translateX(12px); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
-@keyframes gridDrift {
-  0% { background-position: 0 0; }
-  100% { background-position: 80px 80px; }
+.caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  background: currentColor;
+  vertical-align: -0.12em;
+  margin-left: 0.15em;
+  animation: caret-blink 1.05s steps(1) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -97,39 +169,9 @@
   }
 }
 
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgba(99, 102, 241, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
-  background-size: 80px 80px;
-  animation: gridDrift 30s linear infinite;
-}
-
-@media (prefers-color-scheme: dark) {
-  .bg-grid {
-    background-image:
-      linear-gradient(to right, rgba(139, 134, 255, 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(139, 134, 255, 0.06) 1px, transparent 1px);
-  }
-}
-
-.text-gradient {
-  background: linear-gradient(120deg, oklch(0.55 0.215 260), oklch(0.62 0.22 320));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .glass {
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-}
-
-@media (prefers-color-scheme: dark) {
-  .glass {
-    background: rgba(20, 20, 35, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
+  background: hsla(var(--paper) / 0.7);
+  border: 1px solid hsla(var(--border) / 1);
 }

@@ -1,265 +1,142 @@
 'use client';
 
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/css';
-
-type Space = {
-  id: string;
-  title: string;
-  badge: string;
-  gradient: string;
-  accent: string;
-  render: () => React.ReactNode;
-};
-
-const SPACES: Space[] = [
-  {
-    id: 'code',
-    title: 'Code',
-    badge: 'Cursor',
-    gradient: 'from-[#1e1b4b] via-[#312e81] to-[#0f172a]',
-    accent: '#a78bfa',
-    render: () => (
-      <div className="font-mono text-[10px] leading-[1.55] text-slate-300/90 select-none">
-        <div className="text-slate-500">// focus.ts</div>
-        <div><span className="text-pink-400">export</span> <span className="text-violet-300">const</span> <span className="text-sky-300">enterFocus</span> = () =&gt; {'{'}</div>
-        <div className="pl-3"><span className="text-violet-300">const</span> spaces = <span className="text-amber-300">await</span> getSpaces();</div>
-        <div className="pl-3">spaces.filter(s =&gt; s.tag === <span className="text-emerald-300">&apos;code&apos;</span>);</div>
-        <div className="pl-3"><span className="text-pink-400">return</span> swap(0);</div>
-        <div>{'}'}</div>
-        <div className="text-emerald-400 mt-2">✓ compiled in 23ms</div>
-      </div>
-    ),
-  },
-  {
-    id: 'design',
-    title: 'Design',
-    badge: 'Figma',
-    gradient: 'from-[#0c1f2e] via-[#103044] to-[#08111a]',
-    accent: '#22d3ee',
-    render: () => (
-      <div className="relative h-full w-full">
-        <div className="absolute left-2 top-1 flex gap-1.5">
-          <div className="h-2 w-2 rounded-sm bg-cyan-400/80" />
-          <div className="h-2 w-2 rounded-sm bg-fuchsia-400/80" />
-          <div className="h-2 w-2 rounded-sm bg-amber-300/80" />
-        </div>
-        <div className="absolute left-6 top-7 h-14 w-20 rounded-md bg-gradient-to-br from-cyan-300/30 to-cyan-500/10 border border-cyan-300/30" />
-        <div className="absolute left-28 top-5 h-10 w-10 rounded-full bg-gradient-to-br from-fuchsia-400/40 to-fuchsia-700/20 border border-fuchsia-400/30" />
-        <div className="absolute right-3 top-12 h-8 w-16 rounded-md bg-gradient-to-br from-amber-300/30 to-amber-500/10 border border-amber-300/30" />
-        <div className="absolute left-3 bottom-3 right-3 h-1 rounded-full bg-cyan-400/40" />
-      </div>
-    ),
-  },
-  {
-    id: 'writing',
-    title: 'Writing',
-    badge: 'iA Writer',
-    gradient: 'from-[#fafaf5] via-[#f3f1e7] to-[#e9e7dd]',
-    accent: '#0f172a',
-    render: () => (
-      <div className="font-mono text-[10px] leading-[1.7] text-slate-700 select-none">
-        <div className="text-slate-400"># A Quiet Morning</div>
-        <div className="h-1.5" />
-        <div>The cursor blinked, patient.</div>
-        <div>Outside, fog clung to the firs.</div>
-        <div>She wrote the first true sentence</div>
-        <div>she had written in a year.</div>
-        <div className="mt-2 inline-block h-2 w-1 bg-slate-700 animate-pulse" />
-      </div>
-    ),
-  },
-  {
-    id: 'music',
-    title: 'Music',
-    badge: 'Logic Pro',
-    gradient: 'from-[#1c0a1f] via-[#3d0d3a] to-[#0a0314]',
-    accent: '#f0abfc',
-    render: () => (
-      <div className="relative h-full w-full">
-        <div className="flex items-end gap-0.5 absolute left-2 right-2 bottom-3 h-12">
-          {Array.from({ length: 28 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex-1 rounded-sm bg-gradient-to-t from-fuchsia-500/70 to-fuchsia-300/90"
-              style={{ height: `${20 + Math.sin(i * 0.7) * 28 + 36}%` }}
-            />
-          ))}
-        </div>
-        <div className="absolute left-3 top-2 right-3 flex items-center gap-2">
-          <div className="h-1.5 flex-1 rounded-full bg-white/10 overflow-hidden">
-            <div className="h-full w-3/5 bg-gradient-to-r from-fuchsia-300 to-pink-300" />
-          </div>
-          <span className="text-[9px] font-mono text-fuchsia-200">02:14</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'meetings',
-    title: 'Meetings',
-    badge: 'Zoom',
-    gradient: 'from-[#0a1424] via-[#0d2540] to-[#040b18]',
-    accent: '#60a5fa',
-    render: () => (
-      <div className="grid grid-cols-2 gap-1.5 h-full w-full p-1">
-        {[
-          'bg-gradient-to-br from-sky-300/40 to-sky-700/20',
-          'bg-gradient-to-br from-emerald-300/40 to-emerald-700/20',
-          'bg-gradient-to-br from-rose-300/40 to-rose-700/20',
-          'bg-gradient-to-br from-amber-300/40 to-amber-700/20',
-        ].map((g, i) => (
-          <div key={i} className={cn('relative rounded-md border border-white/10 overflow-hidden', g)}>
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white/60" />
-            <div className="absolute bottom-0.5 left-1 right-1 h-0.5 rounded-full bg-white/30" />
-          </div>
-        ))}
-      </div>
-    ),
-  },
-];
+import { CATEGORIES, type Category } from './categories';
 
 interface SpacesStackProps {
-  activeId?: string;
+  activeIndex: number;
 }
 
-export function SpacesStack({ activeId }: SpacesStackProps) {
-  const [order, setOrder] = useState(SPACES.map((s) => s.id));
+/**
+ * 3 themed app-windows for the active category, in a 3D parallax stack.
+ * - Pointer move tilts the whole stack.
+ * - When `activeIndex` changes, each slot cross-fades its window content
+ *   (the slots themselves don't move — they stay anchored).
+ */
+export function SpacesStack({ activeIndex }: SpacesStackProps) {
+  const category = CATEGORIES[activeIndex];
+
+  // pointer parallax
   const px = useMotionValue(0);
   const py = useMotionValue(0);
-  const sx = useSpring(px, { stiffness: 60, damping: 18, mass: 0.6 });
-  const sy = useSpring(py, { stiffness: 60, damping: 18, mass: 0.6 });
-  const rotY = useTransform(sx, [-1, 1], [12, -12]);
-  const rotX = useTransform(sy, [-1, 1], [-8, 8]);
+  const sx = useSpring(px, { stiffness: 70, damping: 18, mass: 0.7 });
+  const sy = useSpring(py, { stiffness: 70, damping: 18, mass: 0.7 });
+  const rotY = useTransform(sx, [-1, 1], [10, -10]);
+  const rotX = useTransform(sy, [-1, 1], [-7, 7]);
 
-  // Auto-cycle when no activeId provided
-  useEffect(() => {
-    if (activeId) return;
-    const id = setInterval(() => {
-      setOrder((o) => [...o.slice(1), o[0]]);
-    }, 3200);
-    return () => clearInterval(id);
-  }, [activeId]);
-
-  // Sync order with rotating word
-  useEffect(() => {
-    if (!activeId) return;
-    setOrder((current) => {
-      if (current[0] === activeId) return current;
-      const idx = current.indexOf(activeId);
-      if (idx <= 0) return current;
-      return [...current.slice(idx), ...current.slice(0, idx)];
-    });
-  }, [activeId]);
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
-    const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
-    const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
-    px.set(nx);
-    py.set(ny);
+    px.set(((e.clientX - r.left) / r.width) * 2 - 1);
+    py.set(((e.clientY - r.top) / r.height) * 2 - 1);
   };
-  const handlePointerLeave = () => {
+  const handleLeave = () => {
     px.set(0);
     py.set(0);
   };
 
+  // Slot geometry: 0 = front (largest), 1 = mid, 2 = back
+  const slots = [
+    { z: 0, x: 0, y: 0, rotZ: 0, scale: 1, opacity: 1, blur: 0 },
+    { z: -90, x: -36, y: -32, rotZ: -4.5, scale: 0.86, opacity: 0.85, blur: 0.6 },
+    { z: -180, x: 28, y: 36, rotZ: 4, scale: 0.78, opacity: 0.7, blur: 1.2 },
+  ] as const;
+
   return (
     <motion.div
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
-      className="relative h-[420px] sm:h-[480px] lg:h-[540px] w-full select-none"
-      style={{ perspective: 1400 }}
+      onPointerMove={handleMove}
+      onPointerLeave={handleLeave}
+      className="relative h-[440px] sm:h-[520px] lg:h-[580px] w-full select-none"
+      style={{ perspective: 1500 }}
     >
       <motion.div
         className="absolute inset-0"
-        style={{
-          transformStyle: 'preserve-3d',
-          rotateX: rotX,
-          rotateY: rotY,
-        }}
+        style={{ transformStyle: 'preserve-3d', rotateX: rotX, rotateY: rotY }}
       >
-        {order.map((id, i) => {
-          const space = SPACES.find((s) => s.id === id)!;
-          const depth = i;
-          const z = -depth * 70;
-          const y = depth * 28;
-          const x = depth * 18;
-          const rotate = depth * -2.4;
-          const opacity = 1 - depth * 0.12;
+        {slots.map((slot, i) => {
+          // back card renders deepest in DOM so front overlaps it
+          const slotIndex = slots.length - 1 - i;
+          const s = slots[slotIndex];
+          const win = category.windows[slotIndex];
           return (
             <motion.div
-              key={id}
-              layout
-              initial={false}
+              key={slotIndex}
               animate={{
-                z,
-                y,
-                x,
-                rotateZ: rotate,
-                opacity,
+                z: s.z,
+                x: s.x,
+                y: s.y,
+                rotateZ: s.rotZ,
+                scale: s.scale,
+                opacity: s.opacity,
               }}
-              transition={{
-                type: 'spring',
-                stiffness: 90,
-                damping: 18,
-                mass: 0.8,
-              }}
-              onClick={() => setOrder((o) => [id, ...o.filter((v) => v !== id)])}
+              transition={{ type: 'spring', stiffness: 110, damping: 20, mass: 0.7 }}
               style={{
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
                 translateX: '-50%',
                 translateY: '-50%',
-                zIndex: SPACES.length - depth,
                 transformStyle: 'preserve-3d',
-                cursor: depth === 0 ? 'default' : 'pointer',
+                zIndex: 10 - slotIndex,
+                filter: s.blur ? `blur(${s.blur}px)` : undefined,
               }}
-              className="w-[88%] max-w-[440px]"
+              className="w-full max-w-[560px] px-2"
             >
-              <SpaceCard space={space} active={depth === 0} />
+              <SlotCard category={category} win={win} active={slotIndex === 0} />
             </motion.div>
           );
         })}
       </motion.div>
 
-      {/* Floor reflection / shadow */}
+      {/* Floor shadow */}
       <div
         aria-hidden
-        className="absolute left-1/2 bottom-2 -translate-x-1/2 h-8 w-[60%] rounded-full bg-brand-500/30 blur-2xl"
+        className="absolute left-1/2 bottom-3 -translate-x-1/2 h-10 w-[60%] rounded-full bg-brand-500/30 dark:bg-brand-400/20 blur-3xl"
       />
 
       {/* Keyboard hint */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-mono">
+      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-mono z-20">
         <Kbd>⌘</Kbd>
         <Kbd>⇥</Kbd>
-        <span className="ml-1.5">to switch</span>
+        <span className="ml-1">switch · </span>
+        <Kbd>⌥</Kbd>
+        <Kbd>1</Kbd>
+        <span className="ml-1">jump</span>
       </div>
     </motion.div>
   );
 }
 
-function SpaceCard({ space, active }: { space: Space; active: boolean }) {
+function SlotCard({
+  category,
+  win,
+  active,
+}: {
+  category: Category;
+  win: Category['windows'][number];
+  active: boolean;
+}) {
   return (
     <div
       className={cn(
-        'relative rounded-2xl overflow-hidden shadow-2xl border',
-        'aspect-[16/10]',
+        'relative rounded-[14px] overflow-hidden border aspect-[16/10] shadow-2xl',
         active
-          ? 'border-white/20 shadow-[0_30px_90px_-30px_rgba(99,102,241,0.55)]'
-          : 'border-white/10 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.4)]',
+          ? 'border-white/20 shadow-[0_40px_120px_-30px_rgba(245,158,11,0.45)] dark:shadow-[0_40px_120px_-30px_rgba(252,184,64,0.4)]'
+          : 'border-white/10 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.5)]',
       )}
     >
-      <div className={cn('absolute inset-0 bg-gradient-to-br', space.gradient)} />
-      <div className="absolute inset-0 opacity-30" style={{
-        backgroundImage:
-          'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18), transparent 60%)',
-      }} />
+      {/* Card surface (per-window theme) */}
+      <div className={cn('absolute inset-0 bg-gradient-to-br', win.toneClass)} />
+      <div
+        className="absolute inset-0 opacity-25 pointer-events-none"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 30% 18%, rgba(255,255,255,0.22), transparent 60%)',
+        }}
+      />
 
       {/* Window chrome */}
-      <div className="absolute top-0 inset-x-0 h-7 flex items-center px-3 gap-1.5 bg-black/20 backdrop-blur-md border-b border-white/5">
+      <div className="absolute top-0 inset-x-0 h-7 flex items-center px-3 gap-1.5 bg-black/25 backdrop-blur-md border-b border-white/5">
         <div className="flex gap-1.5">
           <div className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
           <div className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
@@ -267,26 +144,37 @@ function SpaceCard({ space, active }: { space: Space; active: boolean }) {
         </div>
         <div className="ml-auto flex items-center gap-1.5">
           <span
-            className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded text-white/80 bg-white/10 border border-white/10"
-            style={{ color: space.accent }}
+            className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded text-white/90 bg-white/10 border border-white/10"
+            style={{ color: win.accent }}
           >
-            {space.badge}
+            {win.app}
           </span>
         </div>
       </div>
 
-      {/* Content */}
+      {/* Animated content swap on category change */}
       <div className="absolute inset-x-3 top-9 bottom-3">
-        {space.render()}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={category.id + ':' + win.app}
+            initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+            transition={{ duration: 0.32, ease: [0.25, 0.8, 0.25, 1] }}
+            className="h-full w-full"
+          >
+            {win.render()}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* Active glow ring */}
+      {/* Front-card accent ring */}
       {active && (
         <div
           aria-hidden
-          className="absolute inset-0 rounded-2xl pointer-events-none"
+          className="absolute inset-0 rounded-[14px] pointer-events-none transition-opacity"
           style={{
-            boxShadow: `inset 0 0 0 1px ${space.accent}40, 0 0 0 1px ${space.accent}30`,
+            boxShadow: `inset 0 0 0 1px ${win.accent}50, 0 0 0 1px ${win.accent}30`,
           }}
         />
       )}
@@ -301,5 +189,3 @@ function Kbd({ children }: { children: React.ReactNode }) {
     </kbd>
   );
 }
-
-export { SPACES };
