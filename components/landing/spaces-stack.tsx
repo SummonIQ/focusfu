@@ -49,7 +49,10 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
       blur: 0.8,
       opacity: 0.95,
       exitX: -80,
-      enterX: -40,
+      // Start inward (toward center) and splay outward as the entry
+      // animation completes. enterX is in pixels relative to the slot
+      // position.
+      enterX: 120,
     },
     {
       windowIdx: 0, // front
@@ -75,7 +78,7 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
       blur: 0.8,
       opacity: 0.95,
       exitX: 80,
-      enterX: 40,
+      enterX: -120,
     },
   ] as const;
 
@@ -111,32 +114,43 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={category.id}
-                  // Float UP into position, splay outward (x to slot
-                  // offset is already on the parent div), no rotation
-                  // on entry/exit — reads as cards rising into place
-                  // rather than tumbling in.
+                  // Cards SCALE UP from small + start near center,
+                  // splaying outward as they grow into their slot
+                  // positions. No rotation on entry/exit — cards rise
+                  // and fan rather than tumble.
                   initial={{
                     opacity: 0,
-                    y: 40,
-                    scale: 0.92,
-                    filter: 'blur(8px)',
+                    x: slot.enterX,
+                    y: 30,
+                    scale: 0.72,
+                    filter: 'blur(10px)',
                   }}
                   animate={{
                     opacity: 1,
+                    x: 0,
                     y: 0,
                     scale: 1,
                     filter: 'blur(0px)',
                   }}
                   exit={{
                     opacity: 0,
-                    y: 40,
+                    x: slot.exitX,
+                    y: 30,
                     scale: 0.94,
                     filter: 'blur(8px)',
                   }}
                   transition={{
-                    duration: 0.6,
-                    delay: i * 0.06,
+                    duration: 0.72,
+                    delay: i * 0.07,
                     ease: [0.32, 0.72, 0.32, 1],
+                    // X (splay) eases on a slightly slower curve so
+                    // the splay happens TOWARD the end of the entry,
+                    // not at the start.
+                    x: {
+                      duration: 0.72,
+                      delay: i * 0.07,
+                      ease: [0.55, 0, 0.4, 1],
+                    },
                   }}
                   style={{ transformStyle: 'preserve-3d' }}
                 >
