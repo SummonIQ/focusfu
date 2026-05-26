@@ -9,21 +9,20 @@ interface SpacesStackProps {
 }
 
 /**
- * 3 themed app-windows for the active category, in a 3D parallax stack.
- * - Pointer move tilts the whole stack.
- * - When `activeIndex` changes, each slot cross-fades its window content
- *   (the slots themselves don't move — they stay anchored).
+ * Splayed-out arrangement: 3 windows visible side-by-side (back-left, front
+ * center, back-right). On category change, every slot does a coordinated
+ * exit + enter so the whole set swaps as one motion.
  */
 export function SpacesStack({ activeIndex }: SpacesStackProps) {
   const category = CATEGORIES[activeIndex];
 
-  // pointer parallax
+  // pointer parallax — tilts the whole arrangement
   const px = useMotionValue(0);
   const py = useMotionValue(0);
-  const sx = useSpring(px, { stiffness: 70, damping: 18, mass: 0.7 });
-  const sy = useSpring(py, { stiffness: 70, damping: 18, mass: 0.7 });
-  const rotY = useTransform(sx, [-1, 1], [10, -10]);
-  const rotX = useTransform(sy, [-1, 1], [-7, 7]);
+  const sx = useSpring(px, { stiffness: 65, damping: 20, mass: 0.7 });
+  const sy = useSpring(py, { stiffness: 65, damping: 20, mass: 0.7 });
+  const rotY = useTransform(sx, [-1, 1], [8, -8]);
+  const rotX = useTransform(sy, [-1, 1], [-6, 6]);
 
   const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -35,70 +34,134 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
     py.set(0);
   };
 
-  // Slot geometry: 0 = front (largest), 1 = mid, 2 = back
-  const slots = [
-    { z: 0, x: 0, y: 0, rotZ: 0, scale: 1, opacity: 1, blur: 0 },
-    { z: -90, x: -36, y: -32, rotZ: -4.5, scale: 0.86, opacity: 0.85, blur: 0.6 },
-    { z: -180, x: 28, y: 36, rotZ: 4, scale: 0.78, opacity: 0.7, blur: 1.2 },
+  // Splay positions: back-left, front-center, back-right.
+  // Index in this array maps to a *category window* index (1, 0, 2) so
+  // window[0] is the hero/front card.
+  const SLOTS = [
+    {
+      windowIdx: 1, // back-left
+      x: '-46%',
+      y: '6%',
+      scale: 0.78,
+      rotateZ: -7,
+      z: -120,
+      zIndex: 1,
+      blur: 0.8,
+      opacity: 0.95,
+      exitX: -80,
+      enterX: -40,
+    },
+    {
+      windowIdx: 0, // front
+      x: '0%',
+      y: '-2%',
+      scale: 1,
+      rotateZ: 0,
+      z: 60,
+      zIndex: 3,
+      blur: 0,
+      opacity: 1,
+      exitX: 0,
+      enterX: 0,
+    },
+    {
+      windowIdx: 2, // back-right
+      x: '46%',
+      y: '6%',
+      scale: 0.78,
+      rotateZ: 7,
+      z: -120,
+      zIndex: 2,
+      blur: 0.8,
+      opacity: 0.95,
+      exitX: 80,
+      enterX: 40,
+    },
   ] as const;
 
   return (
     <motion.div
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      className="relative h-[440px] sm:h-[520px] lg:h-[580px] w-full select-none"
-      style={{ perspective: 1500 }}
+      className="relative h-[460px] sm:h-[540px] lg:h-[620px] w-full select-none"
+      style={{ perspective: 1600 }}
     >
       <motion.div
         className="absolute inset-0"
         style={{ transformStyle: 'preserve-3d', rotateX: rotX, rotateY: rotY }}
       >
-        {slots.map((slot, i) => {
-          // back card renders deepest in DOM so front overlaps it
-          const slotIndex = slots.length - 1 - i;
-          const s = slots[slotIndex];
-          const win = category.windows[slotIndex];
+        {SLOTS.map((slot, i) => {
+          const win = category.windows[slot.windowIdx];
           return (
-            <motion.div
-              key={slotIndex}
-              animate={{
-                z: s.z,
-                x: s.x,
-                y: s.y,
-                rotateZ: s.rotZ,
-                scale: s.scale,
-                opacity: s.opacity,
-              }}
-              transition={{ type: 'spring', stiffness: 110, damping: 20, mass: 0.7 }}
+            <div
+              key={i}
               style={{
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
-                translateX: '-50%',
-                translateY: '-50%',
+                width: '70%',
+                maxWidth: 540,
+                transform: `translate(-50%, -50%) translate3d(${slot.x}, ${slot.y}, ${slot.z}px) rotateZ(${slot.rotateZ}deg) scale(${slot.scale})`,
                 transformStyle: 'preserve-3d',
-                zIndex: 10 - slotIndex,
-                filter: s.blur ? `blur(${s.blur}px)` : undefined,
+                zIndex: slot.zIndex,
+                filter: slot.blur ? `blur(${slot.blur}px)` : undefined,
+                opacity: slot.opacity,
               }}
-              className="w-full max-w-[560px] px-2"
             >
-              <SlotCard category={category} win={win} active={slotIndex === 0} />
-            </motion.div>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={category.id}
+                  initial={{
+                    opacity: 0,
+                    x: slot.enterX,
+                    y: -18,
+                    scale: 0.92,
+                    rotateY: -22,
+                    filter: 'blur(8px)',
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    rotateY: 0,
+                    filter: 'blur(0px)',
+                  }}
+                  exit={{
+                    opacity: 0,
+                    x: slot.exitX,
+                    y: 18,
+                    scale: 0.92,
+                    rotateY: 22,
+                    filter: 'blur(8px)',
+                  }}
+                  transition={{
+                    duration: 0.65,
+                    delay: i * 0.08,
+                    ease: [0.32, 0.72, 0.32, 1],
+                  }}
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  <Window win={win} active={i === 1} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           );
         })}
       </motion.div>
 
-      {/* Floor shadow */}
+      {/* Floor reflection */}
       <div
         aria-hidden
-        className="absolute left-1/2 bottom-3 -translate-x-1/2 h-10 w-[60%] rounded-full bg-brand-500/30 dark:bg-brand-400/20 blur-3xl"
+        className="absolute left-1/2 bottom-4 -translate-x-1/2 h-12 w-[70%] rounded-full bg-brand-500/30 dark:bg-brand-400/20 blur-3xl"
       />
 
       {/* Keyboard hint */}
-      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-mono z-20">
+      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-mono z-20">
         <Kbd>⌘</Kbd>
         <Kbd>⇥</Kbd>
-        <span className="ml-1">switch · </span>
+        <span className="ml-1">switch</span>
+        <span className="opacity-50 mx-2">·</span>
         <Kbd>⌥</Kbd>
         <Kbd>1</Kbd>
         <span className="ml-1">jump</span>
@@ -107,25 +170,16 @@ export function SpacesStack({ activeIndex }: SpacesStackProps) {
   );
 }
 
-function SlotCard({
-  category,
-  win,
-  active,
-}: {
-  category: Category;
-  win: Category['windows'][number];
-  active: boolean;
-}) {
+function Window({ win, active }: { win: Category['windows'][number]; active: boolean }) {
   return (
     <div
       className={cn(
         'relative rounded-[14px] overflow-hidden border aspect-[16/10] shadow-2xl',
         active
-          ? 'border-white/20 shadow-[0_40px_120px_-30px_rgba(245,158,11,0.45)] dark:shadow-[0_40px_120px_-30px_rgba(252,184,64,0.4)]'
-          : 'border-white/10 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.5)]',
+          ? 'border-white/20 shadow-[0_50px_140px_-30px_rgba(245,158,11,0.5)] dark:shadow-[0_50px_140px_-30px_rgba(252,184,64,0.45)]'
+          : 'border-white/10 shadow-[0_25px_80px_-25px_rgba(0,0,0,0.55)]',
       )}
     >
-      {/* Card surface (per-window theme) */}
       <div className={cn('absolute inset-0 bg-gradient-to-br', win.toneClass)} />
       <div
         className="absolute inset-0 opacity-25 pointer-events-none"
@@ -152,27 +206,12 @@ function SlotCard({
         </div>
       </div>
 
-      {/* Animated content swap on category change */}
-      <div className="absolute inset-x-3 top-9 bottom-3">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={category.id + ':' + win.app}
-            initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
-            transition={{ duration: 0.32, ease: [0.25, 0.8, 0.25, 1] }}
-            className="h-full w-full"
-          >
-            {win.render()}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      <div className="absolute inset-x-3 top-9 bottom-3">{win.render()}</div>
 
-      {/* Front-card accent ring */}
       {active && (
         <div
           aria-hidden
-          className="absolute inset-0 rounded-[14px] pointer-events-none transition-opacity"
+          className="absolute inset-0 rounded-[14px] pointer-events-none"
           style={{
             boxShadow: `inset 0 0 0 1px ${win.accent}50, 0 0 0 1px ${win.accent}30`,
           }}

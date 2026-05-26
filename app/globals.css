@@ -152,13 +152,11 @@
 }
 
 .caret {
-  display: inline-block;
-  width: 0.55em;
-  height: 1em;
-  background: currentColor;
-  vertical-align: -0.12em;
-  margin-left: 0.15em;
+  width: 2px;
+  height: 0.78em;
+  vertical-align: -0.04em;
   animation: caret-blink 1.05s steps(1) infinite;
+  border-radius: 1px;
 }
 
 @media (prefers-reduced-motion: reduce) {

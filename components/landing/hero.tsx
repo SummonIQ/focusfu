@@ -14,7 +14,7 @@ export function Hero() {
   useEffect(() => {
     const id = setInterval(() => {
       setActiveIndex((i) => (i + 1) % CATEGORIES.length);
-    }, 2800);
+    }, 5800);
     return () => clearInterval(id);
   }, []);
 
@@ -42,7 +42,7 @@ export function Hero() {
       <InteractiveSpotlight className="-z-10" />
 
       <div className="relative mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-10 lg:gap-14 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)] gap-10 lg:gap-12 items-center">
           {/* Copy column */}
           <div className="relative max-w-xl">
             <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-paper border border-brand-500/20 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
