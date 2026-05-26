@@ -31,8 +31,11 @@ interface AnimatedWordProps {
  *    letters with descenders cast denser shadow tips.
  */
 
-const PLATFORM_OVERHANG = 16;
-const PLATFORM_CLIP = 'polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)';
+const PLATFORM_OVERHANG = 24;
+// Light inset so the trapezoid still narrows toward the back but the
+// platform's top edge always extends fully past the word's left/right
+// letters regardless of word length.
+const PLATFORM_CLIP = 'polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%)';
 
 const INITIAL = {
   y: '-0.95em',
@@ -184,8 +187,8 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.06em',
-          height: '0.4em',
+          bottom: '-0.18em',
+          height: '0.52em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           background:
@@ -206,8 +209,8 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         className="absolute pointer-events-none z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.06em',
-          height: '0.4em',
+          bottom: '-0.18em',
+          height: '0.52em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           overflow: 'hidden',
@@ -229,7 +232,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
               bottom: '100%',
               // Skew the cast shadow so it reads as cast from an off-axis
               // light source onto the tilted platform — not a flat dupe.
-              transform: 'translateY(0.26em) skewX(-22deg)',
+              transform: 'translateY(0.36em) skewX(-22deg)',
               transformOrigin: 'left bottom',
               backgroundImage:
                 'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 88%, rgba(0,0,0,0.74) 100%)',
