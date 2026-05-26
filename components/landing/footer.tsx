@@ -30,14 +30,14 @@ export function Footer() {
             alt="FocusFu"
             width={494}
             height={160}
-            className="h-5 w-auto block dark:hidden"
+            className="h-5 w-auto block dark:hidden -translate-y-px"
           />
           <Image
             src="/branding/wordmark-white.svg"
             alt="FocusFu"
             width={494}
             height={160}
-            className="h-5 w-auto hidden dark:block"
+            className="h-5 w-auto hidden dark:block -translate-y-px"
           />
           <span className="mx-2 text-foreground/30 select-none" aria-hidden>
             ·

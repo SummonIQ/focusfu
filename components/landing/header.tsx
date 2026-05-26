@@ -89,7 +89,7 @@ export function Header() {
               width={494}
               height={160}
               priority
-              className="h-8 w-auto block dark:hidden"
+              className="h-8 w-auto block dark:hidden -translate-y-px"
             />
             <Image
               src="/branding/wordmark-white.svg"
@@ -97,7 +97,7 @@ export function Header() {
               width={494}
               height={160}
               priority
-              className="h-8 w-auto hidden dark:block"
+              className="h-8 w-auto hidden dark:block -translate-y-px"
             />
           </Link>
 
