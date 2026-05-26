@@ -57,37 +57,35 @@ export function Header() {
           style={backdropStyle}
         />
 
-        <div className="relative z-10 mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+        <div className="relative z-10 mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link
             href="/"
-            className="flex items-center gap-2.5 group"
+            className="flex items-center gap-2 group"
             aria-label="FocusFu home"
           >
-            {/* Mark + wordmark rendered separately so the wordmark text
-                can be visibly larger than the F mark to its left. */}
             <Image
               src="/branding/mark.png"
               alt=""
               width={200}
               height={224}
               priority
-              className="h-9 w-auto transition-transform group-hover:scale-[1.04]"
+              className="h-7 w-auto transition-transform group-hover:scale-[1.05]"
             />
             <Image
               src="/branding/wordmark-navy.svg"
               alt="FocusFu"
-              width={800}
-              height={250}
+              width={494}
+              height={160}
               priority
-              className="h-[2.6rem] w-auto block dark:hidden -ml-0.5"
+              className="h-5 w-auto block dark:hidden translate-y-[1px]"
             />
             <Image
               src="/branding/wordmark-white.svg"
               alt="FocusFu"
-              width={800}
-              height={250}
+              width={494}
+              height={160}
               priority
-              className="h-[2.6rem] w-auto hidden dark:block -ml-0.5"
+              className="h-5 w-auto hidden dark:block translate-y-[1px]"
             />
           </Link>
 
