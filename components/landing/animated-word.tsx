@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion, type TargetAndTransition } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CATEGORIES } from './categories';
 
 interface AnimatedWordProps {
@@ -10,13 +10,13 @@ interface AnimatedWordProps {
 
 /**
  * Physics:
- *  - The trapezoid platform is a real 3D object (perspective + rotateX tilt
- *    + clip-path) — it sits below the word, anchored to the LEFT so its
- *    left edge never moves. It stays put except for a sharp scaleY-compress
- *    spring when each new word lands on it.
- *  - The word drops in from above, lands on the platform, dwells, then
- *    "evaporates" upward — opacity + blur + a small lift. It never passes
- *    through the platform.
+ *  - 3D trapezoid platform (perspective + rotateX) sits below the word,
+ *    anchored to the LEFT. Width tracks the current word + 8px overhang
+ *    on each side; left edge never moves.
+ *  - Word drops in from above, lands with a spring bounce (platform
+ *    compresses for ~120ms), dwells, then evaporates upward (blur + fade).
+ *  - Width is measured via refs INSIDE the headline so it uses the
+ *    correct font context, not document.body.
  */
 
 const INITIAL = {
@@ -52,34 +52,49 @@ const TRANSITION = {
   filter: { duration: 0.4 },
 } as const;
 
+const PLATFORM_OVERHANG = 8; // px on each side beyond the word
+
 export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
   const current = CATEGORIES[activeIndex];
-  const [maxWidth, setMaxWidth] = useState<number>(0);
-  const [labelWidths, setLabelWidths] = useState<number[]>([]);
+  const probesRef = useRef<HTMLSpanElement | null>(null);
+  const sizerRef = useRef<HTMLSpanElement | null>(null);
+  const [maxWidth, setMaxWidth] = useState(0);
+  const [currentWordWidth, setCurrentWordWidth] = useState(0);
   const [landing, setLanding] = useState(false);
 
+  // Measure max width across all labels — in the correct font context
+  // (probes are rendered INSIDE the headline so they inherit the h1 font).
   useEffect(() => {
-    if (typeof document === 'undefined') return;
-    const probe = document.createElement('span');
-    probe.style.visibility = 'hidden';
-    probe.style.position = 'absolute';
-    probe.style.whiteSpace = 'nowrap';
-    probe.style.font = 'inherit';
-    probe.className = 'font-bold tracking-tight';
-    document.body.appendChild(probe);
-    const widths: number[] = [];
-    let widest = 0;
-    for (const c of CATEGORIES) {
-      probe.textContent = c.label;
-      const w = probe.offsetWidth;
-      widths.push(w);
-      if (w > widest) widest = w;
+    if (!probesRef.current) return;
+    const measureMax = () => {
+      if (!probesRef.current) return;
+      let widest = 0;
+      for (const child of Array.from(probesRef.current.children) as HTMLElement[]) {
+        widest = Math.max(widest, child.offsetWidth);
+      }
+      setMaxWidth(widest);
+    };
+    measureMax();
+    const ro = new ResizeObserver(measureMax);
+    for (const child of Array.from(probesRef.current.children) as HTMLElement[]) {
+      ro.observe(child);
     }
-    document.body.removeChild(probe);
-    setLabelWidths(widths);
-    setMaxWidth(widest);
+    return () => ro.disconnect();
   }, []);
 
+  // Measure current word width when active label changes (or font loads)
+  useEffect(() => {
+    if (!sizerRef.current) return;
+    const update = () => {
+      if (sizerRef.current) setCurrentWordWidth(sizerRef.current.offsetWidth);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(sizerRef.current);
+    return () => ro.disconnect();
+  }, [activeIndex, maxWidth]);
+
+  // Platform spring-compress when the new word lands
   useEffect(() => {
     const t1 = setTimeout(() => setLanding(true), 260);
     const t2 = setTimeout(() => setLanding(false), 380);
@@ -89,31 +104,53 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
     };
   }, [activeIndex]);
 
-  const currentWidth = labelWidths[activeIndex] ?? 0;
-
   return (
     <span
       className="relative inline-block align-baseline"
       style={{
         minWidth: maxWidth ? `${maxWidth + 8}px` : undefined,
-        // gives the platform real depth when rotated
         perspective: '480px',
       }}
     >
-      {/* Sizer establishes baseline + reserves vertical/horizontal space */}
+      {/* Hidden probes for max width — inside the h1 so they inherit font */}
       <span
+        ref={probesRef}
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          opacity: 0,
+          pointerEvents: 'none',
+          visibility: 'hidden',
+        }}
+      >
+        {CATEGORIES.map((c) => (
+          <span
+            key={c.id}
+            className="font-bold tracking-tight"
+            style={{ position: 'absolute', whiteSpace: 'nowrap' }}
+          >
+            {c.label}
+          </span>
+        ))}
+      </span>
+
+      {/* In-flow sizer — reserves layout space and anchors baseline */}
+      <span
+        ref={sizerRef}
         aria-hidden
         className="invisible font-bold tracking-tight whitespace-nowrap"
       >
         {current.label}
       </span>
 
-      {/* 3D trapezoid platform — tilted back like a stage floor.
-          Left-anchored: only the right edge moves when the word width changes. */}
+      {/* 3D trapezoid platform — left edge fixed, width = word + 16px */}
       <motion.span
         aria-hidden
-        className="absolute left-0 z-[2]"
+        className="absolute z-[2]"
         style={{
+          left: `-${PLATFORM_OVERHANG}px`,
           bottom: '-0.18em',
           height: '0.42em',
           transformOrigin: 'bottom left',
@@ -124,7 +161,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
             '0 10px 20px -8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.18)',
         }}
         animate={{
-          width: currentWidth,
+          width: currentWordWidth + PLATFORM_OVERHANG * 2,
           rotateX: 52,
           scaleY: landing ? 0.55 : 1,
         }}
@@ -137,8 +174,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         }}
       />
 
-      {/* Rotating word — solid brand color, drops in from above, dwells,
-          evaporates upward. Never crosses the platform. */}
+      {/* Rotating word — drops in, dwells, evaporates upward */}
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={current.id}

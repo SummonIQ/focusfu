@@ -19,7 +19,7 @@ export function Hero() {
 
   return (
     <section
-      className="relative overflow-x-clip pt-28 pb-20 sm:pt-36 sm:pb-28"
+      className="relative overflow-x-clip pt-16 pb-20 sm:pt-20 sm:pb-28 lg:pt-24"
       style={
         {
           ['--primary-rgb' as string]: '245, 158, 11',
@@ -39,8 +39,8 @@ export function Hero() {
 
       <div className="relative mx-auto max-w-7xl px-6">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] gap-10 lg:gap-12 items-center">
-          {/* Copy column */}
-          <div className="relative max-w-2xl">
+          {/* Copy column — sits above the visual cards so bleed never covers text */}
+          <div className="relative max-w-2xl z-10">
             <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-paper border border-brand-500/30 backdrop-blur-md shadow-sm shadow-brand-500/10 mb-7">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
@@ -73,7 +73,7 @@ export function Hero() {
               </Link>
               <Link
                 href="#pricing"
-                className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3.5 text-sm font-medium border border-foreground/20 bg-paper backdrop-blur-md hover:border-brand-500/40 transition-all"
+                className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3.5 text-sm font-medium border border-brand-500/30 bg-paper backdrop-blur-md hover:border-brand-500/60 hover:bg-brand-500/5 transition-all"
               >
                 See pricing
                 <ArrowRight className="h-4 w-4" />
@@ -87,8 +87,8 @@ export function Hero() {
             </ul>
           </div>
 
-          {/* Visual column */}
-          <div className="relative">
+          {/* Visual column — sits behind the copy text */}
+          <div className="relative z-0">
             <div className="absolute -inset-10 rounded-[2.5rem] bg-gradient-to-br from-brand-400/25 via-accent-400/20 to-brand-500/10 blur-3xl -z-10" />
             <SpacesStack activeIndex={activeIndex} />
           </div>
