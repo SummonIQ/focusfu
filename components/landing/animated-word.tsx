@@ -1,6 +1,11 @@
 'use client';
 
-import { AnimatePresence, motion, type TargetAndTransition } from 'framer-motion';
+import {
+  AnimatePresence,
+  motion,
+  type TargetAndTransition,
+  type Transition,
+} from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { CATEGORIES } from './categories';
 
@@ -10,23 +15,29 @@ interface AnimatedWordProps {
 
 /**
  * Physics:
- *  - 3D trapezoid platform (perspective + rotateX) sits below the word,
- *    anchored to the LEFT. Width tracks the current word + 8px overhang
- *    on each side; left edge never moves.
- *  - Word drops in from above, lands with a spring bounce (platform
- *    compresses for ~120ms), dwells, then sinks DOWN through the
- *    platform. As it crosses the platform line a bottom-up gradient on
- *    its text fill sweeps from brand color to stone — so the portion
- *    below the platform reads as neutral while the portion above stays
- *    brand. Below the platform it disintegrates (blur + fade).
- *  - Width is measured via refs INSIDE the headline so it uses the
- *    correct font context, not document.body.
+ *  - 3D trapezoid platform sits below the word, anchored LEFT, width =
+ *    current word width + 32px overhang. Spring-compresses on landing.
+ *  - Word drops in from above with a short delay so the outgoing word
+ *    is already mid-fall when the new one arrives — reads as the new
+ *    word pushing the old one through.
+ *  - Word's text fill is a vertical brand → stone gradient keyed off
+ *    --mask-stop. At rest the stop is 100% (all brand). On exit the
+ *    stop sweeps to 0% as the word descends, so the portion that has
+ *    crossed below the platform line reads stone.
+ *  - Past the platform the word continues falling with aggressive
+ *    blur + scale-down + fade — disintegrates.
+ *  - Shadow layer sits on the platform surface (same clip + 3D tilt),
+ *    containing only the deepest descender slice of the word so
+ *    letters with descenders cast denser shadow tips.
  */
 
+const PLATFORM_OVERHANG = 16;
+const PLATFORM_CLIP = 'polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)';
+
 const INITIAL = {
-  y: '-0.9em',
+  y: '-0.95em',
   opacity: 0,
-  scale: 0.96,
+  scale: 0.94,
   filter: 'blur(0px)',
   '--mask-stop': '100%',
 } as unknown as TargetAndTransition;
@@ -40,26 +51,32 @@ const ANIMATE = {
 } as unknown as TargetAndTransition;
 
 const EXIT = {
-  y: ['0em', '0.55em', '1.4em'],
-  opacity: [1, 1, 0],
-  scale: [1, 1, 0.92],
-  filter: ['blur(0px)', 'blur(0.5px)', 'blur(10px)'],
-  '--mask-stop': ['100%', '38%', '0%'],
+  y: ['0em', '0.4em', '1em', '1.8em', '2.6em'],
+  opacity: [1, 1, 0.85, 0.4, 0],
+  scale: [1, 0.98, 0.9, 0.74, 0.55],
+  filter: [
+    'blur(0px)',
+    'blur(1px)',
+    'blur(5px)',
+    'blur(16px)',
+    'blur(34px)',
+  ],
+  '--mask-stop': ['100%', '60%', '18%', '0%', '0%'],
   transition: {
-    duration: 0.78,
-    times: [0, 0.4, 1],
-    ease: [0.5, 0, 0.7, 1],
+    duration: 1.1,
+    times: [0, 0.22, 0.5, 0.78, 1],
+    ease: [0.45, 0, 0.7, 1],
   },
 } as unknown as TargetAndTransition;
 
+// Delaying the incoming word means the outgoing word is mid-fall when
+// the new one drops in — the new label visually pushes the old through.
 const TRANSITION = {
-  y: { type: 'spring', stiffness: 360, damping: 16, mass: 1 },
-  opacity: { duration: 0.28 },
-  scale: { duration: 0.4 },
+  y: { type: 'spring', stiffness: 380, damping: 16, mass: 1, delay: 0.18 },
+  opacity: { duration: 0.28, delay: 0.18 },
+  scale: { duration: 0.4, delay: 0.18 },
   filter: { duration: 0.4 },
-} as const;
-
-const PLATFORM_OVERHANG = 8; // px on each side beyond the word
+} as unknown as Transition;
 
 export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
   const current = CATEGORIES[activeIndex];
@@ -69,8 +86,6 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
   const [currentWordWidth, setCurrentWordWidth] = useState(0);
   const [landing, setLanding] = useState(false);
 
-  // Measure max width across all labels — in the correct font context
-  // (probes are rendered INSIDE the headline so they inherit the h1 font).
   useEffect(() => {
     if (!probesRef.current) return;
     const measureMax = () => {
@@ -89,7 +104,6 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
     return () => ro.disconnect();
   }, []);
 
-  // Measure current word width when active label changes (or font loads)
   useEffect(() => {
     if (!sizerRef.current) return;
     const update = () => {
@@ -101,15 +115,27 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
     return () => ro.disconnect();
   }, [activeIndex, maxWidth]);
 
-  // Platform spring-compress when the new word lands
+  // Compress-spring fires when incoming word arrives; account for entry delay
   useEffect(() => {
-    const t1 = setTimeout(() => setLanding(true), 260);
-    const t2 = setTimeout(() => setLanding(false), 380);
+    const t1 = setTimeout(() => setLanding(true), 440);
+    const t2 = setTimeout(() => setLanding(false), 580);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
   }, [activeIndex]);
+
+  const platformWidth = currentWordWidth + PLATFORM_OVERHANG * 2;
+  const platformAnimate = {
+    width: platformWidth,
+    rotateX: 52,
+    scaleY: landing ? 0.55 : 1,
+  };
+  const platformTransition: Transition = {
+    width: { type: 'spring', stiffness: 230, damping: 26, mass: 0.7 },
+    rotateX: { duration: 0 },
+    scaleY: { type: 'spring', stiffness: landing ? 900 : 240, damping: landing ? 16 : 11 },
+  };
 
   return (
     <span
@@ -143,7 +169,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         ))}
       </span>
 
-      {/* In-flow sizer — reserves layout space and anchors baseline */}
+      {/* In-flow sizer */}
       <span
         ref={sizerRef}
         aria-hidden
@@ -152,40 +178,74 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
         {current.label}
       </span>
 
-      {/* 3D trapezoid platform — left edge fixed, width = word + 16px */}
+      {/* 3D trapezoid platform — moved up so the word sits more clearly on it */}
       <motion.span
         aria-hidden
         className="absolute z-[2]"
         style={{
           left: `-${PLATFORM_OVERHANG}px`,
-          bottom: '-0.18em',
-          height: '0.42em',
+          bottom: '-0.06em',
+          height: '0.4em',
           transformOrigin: 'bottom left',
-          clipPath: 'polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)',
+          clipPath: PLATFORM_CLIP,
           background:
-            'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.32), rgba(var(--stage-rgb), 0.68))',
+            'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.34), rgba(var(--stage-rgb), 0.7))',
           boxShadow:
-            '0 10px 20px -8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.18)',
+            '0 10px 22px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2)',
         }}
-        animate={{
-          width: currentWordWidth + PLATFORM_OVERHANG * 2,
-          rotateX: 52,
-          scaleY: landing ? 0.55 : 1,
-        }}
-        transition={{
-          width: { type: 'spring', stiffness: 230, damping: 26, mass: 0.7 },
-          rotateX: { duration: 0 },
-          scaleY: landing
-            ? { type: 'spring', stiffness: 900, damping: 16 }
-            : { type: 'spring', stiffness: 240, damping: 11 },
-        }}
+        animate={platformAnimate}
+        transition={platformTransition}
       />
 
-      {/* Rotating word — drops in, dwells, sinks DOWN through the platform.
-          A vertical gradient on the text fill is keyed off --mask-stop:
-          above the cursor = brand color, below = neutral stone. As the
-          word descends, --mask-stop sweeps 100% → 0% so the stone region
-          rises up the word in sync with crossing the platform line. */}
+      {/* Cast shadow on the platform — clipped to platform shape + 3D
+          tilt. Only the deepest pixels of the word are visible inside;
+          letters with descenders project further into the shadow region
+          so their tips render denser via the bottom-heavy gradient. */}
+      <motion.div
+        aria-hidden
+        className="absolute pointer-events-none z-[2]"
+        style={{
+          left: `-${PLATFORM_OVERHANG}px`,
+          bottom: '-0.06em',
+          height: '0.4em',
+          transformOrigin: 'bottom left',
+          clipPath: PLATFORM_CLIP,
+          overflow: 'hidden',
+        }}
+        animate={platformAnimate}
+        transition={platformTransition}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={current.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="font-bold tracking-tight whitespace-nowrap"
+            style={{
+              position: 'absolute',
+              left: PLATFORM_OVERHANG,
+              bottom: '100%',
+              // Skew the cast shadow so it reads as cast from an off-axis
+              // light source onto the tilted platform — not a flat dupe.
+              transform: 'translateY(0.26em) skewX(-22deg)',
+              transformOrigin: 'left bottom',
+              backgroundImage:
+                'linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 88%, rgba(0,0,0,0.74) 100%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+              filter: 'blur(0.6px)',
+            }}
+          >
+            {current.label}
+          </motion.span>
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Rotating word — drops in, dwells, sinks through with brand→stone
+          gradient sweep, then disintegrates with aggressive blur + shrink. */}
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={current.id}
@@ -196,7 +256,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           className="absolute left-0 top-0 font-bold tracking-tight whitespace-nowrap z-[3]"
           style={{
             backgroundImage:
-              'linear-gradient(to bottom, var(--word-above) 0%, var(--word-above) var(--mask-stop, 100%), var(--word-below) var(--mask-stop, 100%), var(--word-below) 100%)',
+              'linear-gradient(to bottom, var(--word-above) 0%, var(--word-above) calc(var(--mask-stop, 100%) - 2%), var(--word-below) calc(var(--mask-stop, 100%) + 2%), var(--word-below) 100%)',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             color: 'transparent',
