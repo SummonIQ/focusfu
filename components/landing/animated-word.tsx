@@ -235,8 +235,14 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           // position. -0.16em puts the visible top right at the
           // descender ends — letters sit flush on the slab, no gap,
           // no clipped g/p/y.
-          bottom: '-0.16em',
+          // Platform sits BELOW the falling label. -0.5em (with height
+          // 0.46em) puts the visible top edge right below descender
+          // ends (accounting for rotateX foreshortening). The label
+          // never visually intersects the slab.
+          // translateX(-6px) shifts the whole slab a touch to the left.
+          bottom: '-0.5em',
           height: '0.46em',
+          marginLeft: '-6px',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           background:
@@ -265,8 +271,14 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           // position. -0.16em puts the visible top right at the
           // descender ends — letters sit flush on the slab, no gap,
           // no clipped g/p/y.
-          bottom: '-0.16em',
+          // Platform sits BELOW the falling label. -0.5em (with height
+          // 0.46em) puts the visible top edge right below descender
+          // ends (accounting for rotateX foreshortening). The label
+          // never visually intersects the slab.
+          // translateX(-6px) shifts the whole slab a touch to the left.
+          bottom: '-0.5em',
           height: '0.46em',
+          marginLeft: '-6px',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           overflow: 'hidden',
