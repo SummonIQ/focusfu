@@ -306,14 +306,6 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           exit={EXIT}
           transition={TRANSITION}
           className="absolute left-0 top-0 font-bold tracking-tight whitespace-nowrap z-[3]"
-          style={{
-            // Emboss the glyphs: dark drop below + light rim above.
-            // Stacked drop-shadows respect the glyph alpha so the
-            // result hugs each letter shape rather than the bounding
-            // box.
-            filter:
-              'drop-shadow(0 1px 0 rgba(0,0,0,0.35)) drop-shadow(0 -0.5px 0 rgba(255,255,255,0.18)) drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
-          }}
         >
           <PerCharGradientLabel text={current.label} />
         </motion.span>
