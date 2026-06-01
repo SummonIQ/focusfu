@@ -33,6 +33,10 @@ function CodeWindow() {
       <div className="pl-3 text-amber-200/80">hideDock();</div>
       <div className="pl-3"><span className="text-rose-300">return</span> session.start();</div>
       <div>{'}'}</div>
+      <div className="mt-2 text-amber-200/40 text-[8px]">// focus rules</div>
+      <div className="pl-3">pin(<span className="text-emerald-300">&apos;Cursor&apos;</span>, space.dev);</div>
+      <div className="pl-3">pin(<span className="text-emerald-300">&apos;Arc&apos;</span>, space.docs);</div>
+      <div className="pl-3">shortcut(<span className="text-emerald-300">&apos;⌘⌥1&apos;</span>, enterFocus);</div>
       <div className="text-emerald-300/90 mt-2 text-[8px]">✓ compiled in 23ms · 0 errors</div>
     </div>
   );
@@ -47,6 +51,9 @@ function TerminalWindow() {
       <div className="text-emerald-200/70 text-[8px]">  compiled 38 modules</div>
       <div className="text-sky-200/80 text-[8px] mt-0.5">→ GET / 200 in 42ms</div>
       <div className="text-sky-200/80 text-[8px]">→ GET /api/auth 200 in 18ms</div>
+      <div className="text-emerald-300/70 text-[8px] mt-1">✓ space map synced</div>
+      <div className="text-emerald-300/70 text-[8px]">✓ hotkeys registered</div>
+      <div className="text-amber-200/75 text-[8px]">watching app rules…</div>
       <div className="mt-1.5 inline-block h-2.5 w-1 bg-emerald-200 animate-pulse" />
     </div>
   );
@@ -75,6 +82,19 @@ function BrowserWindow() {
       <div className="flex gap-1 mt-1.5">
         {['Get started', 'API', 'Spaces'].map((t) => (
           <span key={t} className="text-[7px] font-mono rounded px-1 py-0.5 bg-white/8 border border-white/10 text-white/70">{t}</span>
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-1 mt-2">
+        {[
+          ['Hotkeys', '⌘⌥1-9'],
+          ['Rules', '12 active'],
+          ['Profiles', '4 synced'],
+          ['Latency', '38ms'],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-sm bg-white/[0.06] border border-white/10 p-1">
+            <div className="text-[6px] font-mono text-white/40">{label}</div>
+            <div className="text-[7px] font-mono text-white/75">{value}</div>
+          </div>
         ))}
       </div>
     </div>
@@ -190,6 +210,9 @@ function DinoEditor() {
       <div className="pl-2"><span className="text-sky-200">weight</span>: <span className="text-amber-200">8400</span>,</div>
       <div className="pl-2"><span className="text-sky-200">diet</span>: <span className="text-emerald-300">&apos;carnivore&apos;</span>,</div>
       <div className="pl-2"><span className="text-sky-200">fossils</span>: <span className="text-amber-200">50</span>,</div>
+      <div className="pl-2"><span className="text-sky-200">habitat</span>: <span className="text-emerald-300">&apos;floodplain&apos;</span>,</div>
+      <div className="pl-2"><span className="text-sky-200">range</span>: <span className="text-emerald-300">&apos;Laramidia&apos;</span>,</div>
+      <div className="pl-2"><span className="text-sky-200">updatedAt</span>: <span className="text-emerald-300">&apos;2026-03-12&apos;</span>,</div>
       <div>{'};'}</div>
       <div className="text-emerald-300/90 mt-1 text-[7px]">✓ saved · 23 species indexed</div>
     </div>
@@ -209,6 +232,9 @@ function DinoTerminal() {
       <div className="text-emerald-300 mt-1.5">$ npm run dev</div>
       <div className="text-amber-200/80">► http://localhost:5173</div>
       <div className="text-emerald-200/60 text-[8px]">✓ ready in 142ms</div>
+      <div className="text-emerald-300 mt-1">$ npm test</div>
+      <div className="text-emerald-200/60 text-[8px]">✓ taxonomy parser</div>
+      <div className="text-emerald-200/60 text-[8px]">✓ fossil search index</div>
       <div className="mt-0.5 inline-block h-2 w-1 bg-emerald-200 animate-pulse" />
     </div>
   );
@@ -360,6 +386,8 @@ function VideoEditor() {
         { label: 'V1', clips: [{ x: 4, w: 26, color: 'from-violet-500 to-fuchsia-500' }, { x: 33, w: 32, color: 'from-rose-500 to-amber-500' }, { x: 70, w: 24, color: 'from-cyan-500 to-sky-500' }] },
         { label: 'A1', clips: [{ x: 0, w: 95, color: 'from-emerald-500 to-teal-500' }] },
         { label: 'A2', clips: [{ x: 38, w: 30, color: 'from-amber-400 to-orange-500' }] },
+        { label: 'FX', clips: [{ x: 14, w: 20, color: 'from-sky-500 to-cyan-400' }, { x: 58, w: 28, color: 'from-fuchsia-500 to-rose-500' }] },
+        { label: 'TXT', clips: [{ x: 8, w: 18, color: 'from-amber-300 to-orange-500' }, { x: 72, w: 20, color: 'from-violet-500 to-fuchsia-500' }] },
       ].map((track, i) => (
         <div key={i} className="flex items-center gap-1 mb-0.5">
           <span className="text-[6px] font-mono text-violet-300/70 w-3">{track.label}</span>
@@ -424,6 +452,10 @@ function MarkdownEditor() {
       <div>Outside, fog clung to the firs.</div>
       <div>She wrote the first true sentence</div>
       <div>she had written in a year.</div>
+      <div className="h-1.5" />
+      <div>The room brightened by degrees.</div>
+      <div>Tea cooled beside the notebook.</div>
+      <div>Page two began without drama.</div>
       <div className="mt-2 inline-block h-2.5 w-1 bg-stone-700 animate-pulse" />
     </div>
   );
@@ -439,6 +471,9 @@ function OutlineWindow() {
       <div className="pl-3">• Resolution</div>
       <div className="pl-3 text-stone-500">+ new scene?</div>
       <div className="pl-3 text-stone-500">+ epilogue?</div>
+      <div className="pl-3">• Theme</div>
+      <div className="pl-6 text-amber-700/85">↳ sharpen final image</div>
+      <div className="pl-3 text-stone-500">+ title pass</div>
     </div>
   );
 }
@@ -451,6 +486,14 @@ function NotesWindow() {
         if (w === 0) return <div key={i} className="h-1" />;
         return <div key={i} className="h-2 rounded-sm bg-stone-500/40" style={{ width: `${w * 100}%` }} />;
       })}
+      <div className="grid grid-cols-2 gap-1 pt-1">
+        {[0.48, 0.72, 0.58, 0.36].map((w, i) => (
+          <div key={i} className="h-5 rounded-sm bg-stone-500/25 border border-stone-500/20 p-1">
+            <div className="h-1 rounded-sm bg-stone-600/35" style={{ width: `${w * 100}%` }} />
+            <div className="h-1 rounded-sm bg-stone-600/25 mt-1 w-2/3" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -496,6 +539,15 @@ function MusicPlayer() {
           />
         ))}
       </div>
+      <div className="mt-2 space-y-1">
+        {['Deep Work Mix', 'Ambient Focus', 'No-vocal queue', 'Evening reset', 'Tomorrow list'].map((track, i) => (
+          <div key={track} className="flex items-center gap-1.5 rounded-sm bg-white/[0.06] border border-white/10 px-1.5 py-1">
+            <span className="text-[7px] font-mono text-fuchsia-200/65">{String(i + 1).padStart(2, '0')}</span>
+            <span className="text-[7px] font-mono text-fuchsia-100/85 truncate flex-1">{track}</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-fuchsia-300/70" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -525,6 +577,13 @@ function VideoPlayer() {
         <span className="text-[7px] font-mono text-rose-200/80">↗ share</span>
         <span className="ml-auto text-[7px] font-mono text-rose-200/70">+ Subscribe</span>
       </div>
+      <div className="mt-2 space-y-1">
+        {['Up next: clean desktop setup', 'Saved to Watch Later', '3 chapters marked', 'Transcript open', 'Focus playlist queued'].map((row) => (
+          <div key={row} className="rounded-sm bg-white/[0.06] border border-white/10 px-1.5 py-1 text-[7px] font-mono text-rose-100/75">
+            {row}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -532,8 +591,10 @@ function VideoPlayer() {
 function SocialFeed() {
   const posts = [
     { name: 'Indie Dev', handle: '@indie_dev', text: 'Just shipped my Mac focus app 🚀', time: '2h', likes: 89 },
-    { name: 'Cat 🐱', handle: '@catlover', text: 'Sunday afternoon coding mood', time: '4h', likes: 142 },
+    { name: 'Design Ops', handle: '@designops', text: 'Batching reviews before lunch.', time: '3h', likes: 104 },
+    { name: 'Launch Notes', handle: '@shiplog', text: 'Tiny automations saved the day.', time: '4h', likes: 142 },
     { name: 'Design Notes', handle: '@dsgn', text: 'Stop using purple gradients.', time: '6h', likes: 318 },
+    { name: 'Builder', handle: '@builder', text: 'Context switches are the hidden tax.', time: '8h', likes: 211 },
   ];
   return (
     <div className="space-y-1">
@@ -620,6 +681,10 @@ function MeetingNotes() {
       <div className="pl-2 text-emerald-200">✓ pricing approved</div>
       <div className="pl-2 text-emerald-200">✓ analytics wired</div>
       <div className="pl-2 text-rose-200">! reschedule investor call</div>
+      <div className="pt-1 text-sky-200/70">Next</div>
+      <div className="pl-2">— QA download flow</div>
+      <div className="pl-2">— update support macros</div>
+      <div className="pl-2">— confirm launch email</div>
     </div>
   );
 }
@@ -637,6 +702,26 @@ function PDFWindow() {
       <div className="h-1.5 w-full rounded-sm bg-stone-400/40" />
       <div className="h-1.5 w-3/5 rounded-sm bg-stone-400/40" />
       <div className="h-1.5 w-5/6 rounded-sm bg-stone-400/40" />
+      <div className="mt-2 rounded-sm bg-cyan-200/30 border-l-2 border-cyan-500/50 px-1.5 py-1">
+        <div className="h-1.5 w-2/3 rounded-sm bg-cyan-500/40" />
+        <div className="h-1.5 w-full rounded-sm bg-stone-400/35 mt-1" />
+        <div className="h-1.5 w-5/6 rounded-sm bg-stone-400/35 mt-1" />
+      </div>
+      <div className="grid grid-cols-2 gap-1 mt-2">
+        <div className="rounded-sm bg-white/45 border border-cyan-700/10 p-1">
+          <div className="h-1.5 w-3/4 rounded-sm bg-cyan-300/70" />
+          <div className="h-1.5 w-full rounded-sm bg-stone-400/35 mt-1" />
+        </div>
+        <div className="rounded-sm bg-white/45 border border-cyan-700/10 p-1">
+          <div className="h-1.5 w-1/2 rounded-sm bg-amber-300/70" />
+          <div className="h-1.5 w-4/5 rounded-sm bg-stone-400/35 mt-1" />
+        </div>
+      </div>
+      <div className="mt-2 space-y-1">
+        <div className="h-1.5 w-full rounded-sm bg-stone-400/35" />
+        <div className="h-1.5 w-11/12 rounded-sm bg-stone-400/35" />
+        <div className="h-1.5 w-2/3 rounded-sm bg-amber-300/65" />
+      </div>
     </div>
   );
 }
@@ -654,6 +739,18 @@ function HighlightsWindow() {
       <div className="rounded bg-emerald-300/15 border-l-2 border-emerald-300 px-1.5 py-0.5 text-emerald-100 leading-snug">
         &quot;flow is fragile&quot;
       </div>
+      <div className="rounded bg-cyan-300/15 border-l-2 border-cyan-300 px-1.5 py-0.5 text-cyan-100 leading-snug">
+        &quot;attention recovers slowly&quot;
+      </div>
+      <div className="rounded bg-violet-300/15 border-l-2 border-violet-300 px-1.5 py-0.5 text-violet-100 leading-snug">
+        &quot;environment shapes effort&quot;
+      </div>
+      <div className="rounded bg-sky-300/15 border-l-2 border-sky-300 px-1.5 py-0.5 text-sky-100 leading-snug">
+        &quot;notes anchor recall&quot;
+      </div>
+      <div className="rounded bg-lime-300/15 border-l-2 border-lime-300 px-1.5 py-0.5 text-lime-100 leading-snug">
+        &quot;friction compounds quietly&quot;
+      </div>
     </div>
   );
 }
@@ -665,6 +762,9 @@ function SidebarNotes() {
       <div className="rounded bg-white/5 px-1.5 py-1 border border-white/10 leading-snug">p.4 — research gap</div>
       <div className="rounded bg-white/5 px-1.5 py-1 border border-white/10 leading-snug">p.7 — cite for intro</div>
       <div className="rounded bg-white/5 px-1.5 py-1 border border-white/10 leading-snug">p.12 — counterargument</div>
+      <div className="rounded bg-white/5 px-1.5 py-1 border border-white/10 leading-snug">p.18 — define terms</div>
+      <div className="rounded bg-white/5 px-1.5 py-1 border border-white/10 leading-snug">p.21 — add chart</div>
+      <div className="rounded bg-white/5 px-1.5 py-1 border border-white/10 leading-snug">p.27 — follow-up</div>
     </div>
   );
 }
@@ -792,6 +892,14 @@ function TimelineWindow() {
           </div>
         </div>
       ))}
+      <div className="grid grid-cols-2 gap-1 pt-1">
+        {['Brief signed', 'Prototype', 'Beta notes', 'Launch'].map((item, i) => (
+          <div key={item} className="rounded-sm bg-white/[0.06] border border-white/10 px-1.5 py-1">
+            <div className="text-[6px] font-mono text-violet-200/45">0{i + 1}</div>
+            <div className="text-[7px] font-mono text-violet-100/85 truncate">{item}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -805,6 +913,10 @@ function TasksWindow() {
         { done: false, t: 'Wire Stripe checkout', active: true },
         { done: false, t: 'Replay user video' },
         { done: false, t: 'Email investor update' },
+        { done: false, t: 'QA upgrade path' },
+        { done: false, t: 'Finalize launch copy' },
+        { done: false, t: 'Refresh docs screenshots' },
+        { done: false, t: 'Prep support inbox' },
       ].map((task, i) => (
         <div key={i} className="flex items-center gap-1.5">
           <div

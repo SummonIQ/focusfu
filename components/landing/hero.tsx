@@ -91,7 +91,7 @@ export function Hero() {
 
           {/* Visual column — sits behind the copy text */}
           <div className="relative z-0">
-            <div className="absolute -inset-10 rounded-[2.5rem] bg-gradient-to-br from-brand-400/25 via-accent-400/20 to-brand-500/10 blur-3xl -z-10" />
+            <div className="absolute -inset-10 rounded-[2.5rem] bg-gradient-to-br from-brand-400/25 via-accent-400/20 to-brand-500/10 blur-3xl -z-10" style={{ filter: `blur(64px) hue-rotate(${activeIndex * 40}deg)` }} />
             <SpacesStack activeIndex={activeIndex} />
           </div>
         </div>

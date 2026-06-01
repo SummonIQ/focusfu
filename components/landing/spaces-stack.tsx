@@ -198,14 +198,6 @@ function Window({ win, active }: { win: Category['windows'][number]; active: boo
           <div className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
           <div className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
         </div>
-        <div className="ml-auto flex items-center gap-1.5">
-          <span
-            className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded text-white/90 bg-white/10 border border-white/10"
-            style={{ color: win.accent }}
-          >
-            {win.app}
-          </span>
-        </div>
       </div>
 
       <div className="absolute inset-x-3 top-9 bottom-3">{win.render()}</div>
@@ -222,4 +214,3 @@ function Window({ win, active }: { win: Category['windows'][number]; active: boo
     </div>
   );
 }
-
