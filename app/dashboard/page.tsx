@@ -3,6 +3,14 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { auth } from '@/lib/auth/server';
 import { db } from '@/lib/db/client';
+import { createPageMetadata } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Dashboard',
+  description: 'Manage your FocusFu account and download access.',
+  path: '/dashboard',
+  noIndex: true,
+});
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });

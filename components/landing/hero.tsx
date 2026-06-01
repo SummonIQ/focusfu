@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { ArrowRight, Check, Download } from 'lucide-react';
+import { TrackedLink } from '@/components/analytics/tracked-link';
 import { InteractiveSpotlight } from './interactive-spotlight';
 import { AnimatedWord } from './animated-word';
 import { SpacesStack } from './spaces-stack';
@@ -65,21 +65,31 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-9">
-              <Link
+              <TrackedLink
                 href="#download"
+                eventName="focusfu_download_cta_clicked"
+                eventProperties={{
+                  placement: 'hero_primary',
+                  funnelStep: 'download_intent',
+                }}
                 className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-ink-900 dark:bg-brand-500 text-white dark:text-ink-950 px-6 py-3.5 text-sm font-semibold shadow-[0_10px_30px_-10px_rgba(245,158,11,0.6)] transition-all hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-brand-400/0 via-brand-200/40 to-brand-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <Download className="h-4 w-4" />
                 <span>Download for macOS</span>
-              </Link>
-              <Link
+              </TrackedLink>
+              <TrackedLink
                 href="#pricing"
+                eventName="focusfu_pricing_cta_clicked"
+                eventProperties={{
+                  placement: 'hero_secondary',
+                  funnelStep: 'pricing_intent',
+                }}
                 className="inline-flex items-center gap-1.5 rounded-xl px-5 py-3.5 text-sm font-medium border border-brand-500/30 bg-paper backdrop-blur-md hover:border-brand-500/60 hover:bg-brand-500/5 transition-all"
               >
                 See pricing
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </TrackedLink>
             </div>
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">

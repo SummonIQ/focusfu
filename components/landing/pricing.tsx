@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { getAnalytics } from '@summoniq/signalsplash-client-sdk';
+import { useAnalytics } from '@summoniq/signalsplash-client-sdk/react';
 import { Check, Infinity as InfinityIcon, ShieldCheck, Sparkles } from 'lucide-react';
+import { TrackedLink } from '@/components/analytics/tracked-link';
 
 const INCLUDED = [
   'Unlimited named Spaces with custom hotkeys',
@@ -16,9 +18,45 @@ const INCLUDED = [
 
 export function Pricing() {
   const [loading, setLoading] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { track } = useAnalytics();
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
+    let tracked = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting || tracked) return;
+        tracked = true;
+        track('focusfu_pricing_viewed', {
+          source: 'focusfu-web',
+          product: 'focusfu',
+          priceUsd: 99,
+          billingInterval: 'lifetime',
+          funnelStep: 'pricing_view',
+        });
+        observer.disconnect();
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [track]);
 
   const onCheckout = async () => {
+    const checkoutProperties = {
+      source: 'focusfu-web',
+      product: 'focusfu',
+      priceUsd: 99,
+      billingInterval: 'lifetime',
+      funnelStep: 'checkout_start',
+    };
+
     setLoading(true);
+    track('focusfu_checkout_started', checkoutProperties);
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -26,18 +64,45 @@ export function Pricing() {
         body: JSON.stringify({ interval: 'lifetime' }),
       });
       if (res.status === 401) {
+        track('focusfu_checkout_auth_required', {
+          ...checkoutProperties,
+          funnelStep: 'auth_required',
+        });
+        await getAnalytics()?.flush().catch(() => undefined);
         window.location.href = `/signup?next=${encodeURIComponent('/pricing')}`;
         return;
       }
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      if (data.url) {
+        track('focusfu_checkout_redirected', {
+          ...checkoutProperties,
+          funnelStep: 'stripe_redirect',
+          stripeSessionId: data.sessionId ?? null,
+        });
+        await getAnalytics()?.flush().catch(() => undefined);
+        window.location.href = data.url;
+        return;
+      }
+
+      track('focusfu_checkout_failed', {
+        ...checkoutProperties,
+        funnelStep: 'checkout_error',
+        reason: data.error ?? 'missing_checkout_url',
+        status: res.status,
+      });
+    } catch (error) {
+      track('focusfu_checkout_failed', {
+        ...checkoutProperties,
+        funnelStep: 'checkout_error',
+        reason: error instanceof Error ? error.message : 'unknown_error',
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section id="pricing" className="relative py-24 sm:py-32">
+    <section ref={sectionRef} id="pricing" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-3xl px-6">
         <div className="text-center mb-12">
           <p className="text-sm font-semibold text-brand-700 dark:text-brand-300 mb-3 font-mono tracking-wider uppercase">
@@ -100,12 +165,20 @@ export function Pricing() {
                 <InfinityIcon className="h-4 w-4" />
                 {loading ? 'Redirecting…' : 'Get FocusFu — $99 once'}
               </button>
-              <Link
+              <TrackedLink
                 href="#download"
+                eventName="focusfu_trial_cta_clicked"
+                eventProperties={{
+                  placement: 'pricing_card',
+                  product: 'focusfu',
+                  priceUsd: 99,
+                  billingInterval: 'lifetime',
+                  funnelStep: 'trial_download_intent',
+                }}
                 className="inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-4 text-sm font-medium border border-foreground/15 hover:border-brand-500/40 transition-colors"
               >
                 Try free for 14 days
-              </Link>
+              </TrackedLink>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">

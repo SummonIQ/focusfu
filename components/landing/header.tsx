@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { type CSSProperties } from 'react';
+import { TrackedLink } from '@/components/analytics/tracked-link';
 
 const markMaskStyle: CSSProperties = {
   height: 28,
@@ -133,12 +134,17 @@ export function Header() {
             >
               Sign in
             </Link>
-            <Link
+            <TrackedLink
               href="#download"
+              eventName="focusfu_download_cta_clicked"
+              eventProperties={{
+                placement: 'header',
+                funnelStep: 'download_intent',
+              }}
               className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.98] shadow-sm"
             >
               Download
-            </Link>
+            </TrackedLink>
           </div>
         </div>
 

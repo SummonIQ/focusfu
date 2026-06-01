@@ -1,9 +1,40 @@
-import Link from 'next/link';
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { useAnalytics } from '@summoniq/signalsplash-client-sdk/react';
 import { Download } from 'lucide-react';
+import { TrackedLink } from '@/components/analytics/tracked-link';
+import { siteConfig } from '@/lib/seo';
 
 export function CTA() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { track } = useAnalytics();
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
+    let tracked = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting || tracked) return;
+        tracked = true;
+        track('focusfu_download_section_viewed', {
+          source: 'focusfu-web',
+          product: 'focusfu',
+          funnelStep: 'download_section_view',
+        });
+        observer.disconnect();
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [track]);
+
   return (
-    <section id="download" className="relative py-28">
+    <section ref={sectionRef} id="download" className="relative py-28">
       <div className="mx-auto max-w-5xl px-6">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-500 to-accent-500 p-10 sm:p-16 text-center shadow-[0_30px_120px_-40px_rgba(99,102,241,0.6)]">
           <div className="absolute inset-0 opacity-30" style={{
@@ -17,13 +48,21 @@ export function CTA() {
             <p className="text-white/85 text-lg max-w-xl mx-auto mb-8">
               Three minutes to install. One keystroke to switch. Zero clutter forever.
             </p>
-            <Link
-              href="#"
+            <TrackedLink
+              href={siteConfig.downloadHref}
+              eventName="focusfu_download_started"
+              eventProperties={{
+                placement: 'download_section',
+                product: 'focusfu',
+                funnelStep: 'download_start',
+                downloadUrlConfigured: siteConfig.downloadUrlConfigured,
+              }}
+              flush
               className="inline-flex items-center gap-2 rounded-xl bg-white text-brand-700 px-7 py-3.5 text-sm font-semibold shadow-lg hover:scale-[1.03] active:scale-[0.98] transition-all"
             >
               <Download className="h-4 w-4" />
               Download for macOS — free trial
-            </Link>
+            </TrackedLink>
             <p className="mt-4 text-xs text-white/70">macOS 12.0+ · Universal binary · ~12 MB</p>
           </div>
         </div>

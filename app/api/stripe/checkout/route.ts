@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth/server';
 import { db } from '@/lib/db/client';
-import { stripe } from '@/lib/stripe/client';
+import { getStripe } from '@/lib/stripe/client';
 import { getPriceId, type BillingInterval } from '@/lib/stripe/constants';
+import { trackServerEvent } from '@/lib/analytics/server';
 
 export async function POST(request: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
   let customerId = user.stripeCustomerId;
+  const stripe = getStripe();
   if (!customerId) {
     const customer = await stripe.customers.create({
       email: user.email,
@@ -33,6 +35,8 @@ export async function POST(request: NextRequest) {
   }
 
   const origin = request.headers.get('origin') ?? 'https://focusfu.com';
+  const referrer = request.headers.get('referer');
+  const userAgent = request.headers.get('user-agent');
 
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -44,5 +48,26 @@ export async function POST(request: NextRequest) {
     metadata: { userId: user.id, billingInterval: interval },
   });
 
-  return NextResponse.json({ url: checkoutSession.url });
+  await trackServerEvent('focusfu_checkout_session_created', {
+    userId: user.id,
+    sessionId: checkoutSession.id,
+    url: `${origin}/pricing`,
+    path: '/pricing',
+    referrer,
+    userAgent,
+    properties: {
+      product: 'focusfu',
+      funnelStep: 'checkout_session_created',
+      billingInterval: interval,
+      priceId,
+      stripeSessionId: checkoutSession.id,
+      stripeCustomerId: customerId,
+      mode: checkoutSession.mode,
+    },
+  });
+
+  return NextResponse.json({
+    url: checkoutSession.url,
+    sessionId: checkoutSession.id,
+  });
 }
