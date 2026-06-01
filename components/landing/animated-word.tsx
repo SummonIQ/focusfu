@@ -40,10 +40,8 @@ const PLATFORM_OVERHANG_RIGHT = 28; // slightly more on the right so the
                                     // letter hanging over the edge.
 const PLATFORM_OVERHANG_TOTAL = PLATFORM_OVERHANG_LEFT + PLATFORM_OVERHANG_RIGHT;
 const PLATFORM_CLIP = 'polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%)';
-const PLATFORM_THICKNESS_PX = 7;
-const PLATFORM_FRONT_CLIP = `polygon(0% calc(100% - ${PLATFORM_THICKNESS_PX}px), 100% calc(100% - ${PLATFORM_THICKNESS_PX}px), 96% 100%, 4% 100%)`;
-const PLATFORM_LEFT_SIDE_CLIP = `polygon(4% 0%, 0% calc(100% - ${PLATFORM_THICKNESS_PX}px), 4% 100%, 8% ${PLATFORM_THICKNESS_PX}px)`;
-const PLATFORM_RIGHT_SIDE_CLIP = `polygon(96% 0%, 100% calc(100% - ${PLATFORM_THICKNESS_PX}px), 96% 100%, 92% ${PLATFORM_THICKNESS_PX}px)`;
+const PLATFORM_FRONT_DEPTH_PX = 5;
+const PLATFORM_FRONT_CLIP = `polygon(0% calc(100% - ${PLATFORM_FRONT_DEPTH_PX}px), 100% calc(100% - ${PLATFORM_FRONT_DEPTH_PX}px), 100% 100%, 0% 100%)`;
 const SHADOW_CLIP = 'polygon(4% 22px, 96% 22px, 100% 180%, 0% 180%)';
 const SHADOW_MAX_SKEW_DEGREES = 16;
 
@@ -326,27 +324,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
           aria-hidden
           className="absolute inset-x-0 top-0"
           style={{
-            height: `calc(100% + ${PLATFORM_THICKNESS_PX}px)`,
-            clipPath: PLATFORM_LEFT_SIDE_CLIP,
-            background:
-              'linear-gradient(120deg, rgba(var(--stage-rgb), 0.9), rgba(var(--stage-rgb), 0.58))',
-          }}
-        />
-        <span
-          aria-hidden
-          className="absolute inset-x-0 top-0"
-          style={{
-            height: `calc(100% + ${PLATFORM_THICKNESS_PX}px)`,
-            clipPath: PLATFORM_RIGHT_SIDE_CLIP,
-            background:
-              'linear-gradient(240deg, rgba(var(--stage-rgb), 0.92), rgba(var(--stage-rgb), 0.58))',
-          }}
-        />
-        <span
-          aria-hidden
-          className="absolute inset-x-0 top-0"
-          style={{
-            height: `calc(100% + ${PLATFORM_THICKNESS_PX}px)`,
+            height: `calc(100% + ${PLATFORM_FRONT_DEPTH_PX}px)`,
             clipPath: PLATFORM_FRONT_CLIP,
             background:
               'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.78), rgba(var(--stage-rgb), 0.96))',
