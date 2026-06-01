@@ -115,6 +115,7 @@ function PerCharGradientLabel({ text }: { text: string }) {
             //   2. (bottom layer) diagonal lighter→darker brand gradient
             backgroundImage:
               'linear-gradient(to bottom, transparent calc(var(--mask-stop, 100%) - 2%), var(--word-below) calc(var(--mask-stop, 100%) + 2%)), linear-gradient(135deg, var(--char-light) 0%, var(--char-dark) 100%)',
+            backgroundPosition: 'center top, center top',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             color: 'transparent',
