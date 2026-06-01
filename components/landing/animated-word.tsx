@@ -11,6 +11,8 @@ import { CATEGORIES } from './categories';
 
 interface AnimatedWordProps {
   activeIndex: number;
+  labelOverride?: string;
+  paused?: boolean;
 }
 
 /**
@@ -38,6 +40,8 @@ const PLATFORM_OVERHANG_RIGHT = 28; // slightly more on the right so the
                                     // letter hanging over the edge.
 const PLATFORM_OVERHANG_TOTAL = PLATFORM_OVERHANG_LEFT + PLATFORM_OVERHANG_RIGHT;
 const PLATFORM_CLIP = 'polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%)';
+const SHADOW_CLIP = 'polygon(4% 0%, 96% 0%, 100% 140%, 0% 140%)';
+const SHADOW_MAX_SKEW_DEGREES = 16;
 
 const INITIAL = {
   y: '-0.95em',
@@ -122,8 +126,53 @@ function PerCharGradientLabel({ text }: { text: string }) {
   );
 }
 
-export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
-  const current = CATEGORIES[activeIndex];
+function ShadowLabel({ text }: { text: string }) {
+  const chars = Array.from(text);
+  const letterIndexes = chars.map((char, i) =>
+    /\s/.test(char)
+      ? null
+      : chars.slice(0, i).filter((c) => !/\s/.test(c)).length
+  );
+  const lastLetterIndex = Math.max(...letterIndexes.filter((i) => i !== null), 0);
+  const centerIndex = lastLetterIndex / 2;
+  const maxDistance = Math.max(centerIndex, lastLetterIndex - centerIndex, 1);
+
+  return (
+    <>
+      {chars.map((char, i) => {
+        const letterIndex = letterIndexes[i];
+        const skewDegrees =
+          letterIndex === null
+            ? 0
+            : ((letterIndex - centerIndex) / maxDistance) * SHADOW_MAX_SKEW_DEGREES;
+        const descenderShift = /[gjpqy]/.test(char) ? 'translateX(1px)' : '';
+        const inwardSkew = letterIndex === null ? '' : `skewX(${skewDegrees.toFixed(2)}deg)`;
+        const transform = [descenderShift, inwardSkew].filter(Boolean).join(' ');
+
+        return (
+          <span
+            key={`${i}-${char}`}
+            style={{
+              display: 'inline-block',
+              whiteSpace: 'pre',
+              paddingBottom: /[gjpqy]/.test(char) ? '0.22em' : undefined,
+              transform: transform || undefined,
+              transformOrigin: 'center bottom',
+            }}
+          >
+            {char}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+export function AnimatedWord({ activeIndex, labelOverride, paused = false }: AnimatedWordProps) {
+  const currentCategory = CATEGORIES[activeIndex];
+  const current = labelOverride
+    ? { ...currentCategory, label: labelOverride }
+    : currentCategory;
   const probesRef = useRef<HTMLSpanElement | null>(null);
   const sizerRef = useRef<HTMLSpanElement | null>(null);
   const [maxWidth, setMaxWidth] = useState(0);
@@ -163,20 +212,32 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
   // → land at ~330ms. Compress-spring fires *exactly* when the word
   // contacts the slab, not after.
   useEffect(() => {
+    if (paused) {
+      setLanding(false);
+      return;
+    }
     const t1 = setTimeout(() => setLanding(true), 330);
     const t2 = setTimeout(() => setLanding(false), 470);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [activeIndex]);
+  }, [activeIndex, paused]);
 
   const platformWidth = currentWordWidth + PLATFORM_OVERHANG_TOTAL;
   const platformAnimate = {
     width: platformWidth,
     rotateX: 52,
     scaleY: landing ? 0.55 : 1,
+    x: -5,
   };
+  const shadowAnimate = {
+    ...platformAnimate,
+    rotateX: 58,
+    x: -3,
+  };
+  const hasDescender = /[gjpqy]/.test(current.label);
+  const shadowBaseOffset = hasDescender ? '15px' : '10px';
   const platformTransition: Transition = {
     width: { type: 'spring', stiffness: 230, damping: 26, mass: 0.7 },
     rotateX: { duration: 0 },
@@ -239,10 +300,8 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           // 0.46em) puts the visible top edge right below descender
           // ends (accounting for rotateX foreshortening). The label
           // never visually intersects the slab.
-          // translateX(-6px) shifts the whole slab a touch to the left.
-          bottom: '-0.5em',
-          height: '0.46em',
-          marginLeft: '-6px',
+          bottom: 'calc(-0.14em + 2px)',
+          height: '1em',
           transformOrigin: 'bottom left',
           clipPath: PLATFORM_CLIP,
           background:
@@ -275,52 +334,44 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
           // 0.46em) puts the visible top edge right below descender
           // ends (accounting for rotateX foreshortening). The label
           // never visually intersects the slab.
-          // translateX(-6px) shifts the whole slab a touch to the left.
-          bottom: '-0.5em',
-          height: '0.46em',
-          marginLeft: '-6px',
+          bottom: 'calc(-0.14em + 6px + 0.12em - 3px)',
+          height: '1.28em',
           transformOrigin: 'bottom left',
-          clipPath: PLATFORM_CLIP,
-          overflow: 'hidden',
+          clipPath: SHADOW_CLIP,
+          overflow: 'visible',
           // Match the platform's apparent thickness so the shadow region
           // sits on the top face, not the side face.
           marginBottom: 0,
         }}
-        animate={platformAnimate}
+        animate={shadowAnimate}
         transition={platformTransition}
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={current.id}
-            // Shadow snaps in fast (like a contact shadow at the moment
-            // of impact) and diffuses briefly during the platform's
-            // compress-spring before resettling.
-            initial={{ opacity: 0 }}
-            animate={{ opacity: landing ? 0.6 : 1 }}
+            // Shadow rises and fades in with the dropping label, then
+            // diffuses briefly during the platform's compress-spring.
+            initial={paused ? { opacity: 0.86, '--shadow-rise': '0px' } as unknown as TargetAndTransition : { opacity: 0, '--shadow-rise': '18px' } as unknown as TargetAndTransition}
+            animate={{ opacity: landing ? 0.58 : 0.86, '--shadow-rise': '0px' } as unknown as TargetAndTransition}
             exit={{ opacity: 0 }}
             transition={{
-              opacity: { duration: landing ? 0.12 : 0.14, delay: 0 },
+              opacity: { duration: landing ? 0.12 : 0.22, delay: 0 },
+              '--shadow-rise': { type: 'spring', stiffness: 360, damping: 15, mass: 1, delay: 0.12 },
             }}
             className="font-bold tracking-tight whitespace-nowrap"
             style={{
               position: 'absolute',
               left: PLATFORM_OVERHANG_LEFT,
-              bottom: '100%',
-              // Shadow text's TOP sits right at the platform's surface
-              // (the letter bottoms touch and project down into the
-              // slab). All letters cast a visible shadow, not just
-              // those with descenders.
-              transform: 'translateY(0.32em)',
-              transformOrigin: 'left bottom',
-              backgroundImage:
-                'linear-gradient(to bottom, rgba(0,0,0,0) 18%, rgba(0,0,0,0.18) 42%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.82) 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent',
-              filter: landing ? 'blur(1.4px)' : 'blur(0.55px)',
+              transform: `translateX(0px) translateY(calc(-50% + ${shadowBaseOffset} + var(--shadow-rise, 0px) + 26px)) scaleY(1.08)`,
+              transformOrigin: 'left top',
+              fontWeight: 'inherit',
+              color: 'rgba(0,0,0,0.48)',
+              filter: landing ? 'blur(2.4px)' : 'blur(1.6px)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)',
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)',
             }}
           >
-            {current.label}
+            <ShadowLabel text={current.label} />
           </motion.span>
         </AnimatePresence>
       </motion.div>
@@ -330,7 +381,7 @@ export function AnimatedWord({ activeIndex }: AnimatedWordProps) {
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={current.id}
-          initial={INITIAL}
+          initial={paused ? ANIMATE : INITIAL}
           animate={ANIMATE}
           exit={EXIT}
           transition={TRANSITION}
