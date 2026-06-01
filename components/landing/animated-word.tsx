@@ -41,7 +41,6 @@ const PLATFORM_OVERHANG_RIGHT = 28; // slightly more on the right so the
 const PLATFORM_OVERHANG_TOTAL = PLATFORM_OVERHANG_LEFT + PLATFORM_OVERHANG_RIGHT;
 const PLATFORM_CLIP = 'polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%)';
 const PLATFORM_FRONT_DEPTH_PX = 5;
-const PLATFORM_FRONT_CLIP = `polygon(0% calc(100% - ${PLATFORM_FRONT_DEPTH_PX}px), 100% calc(100% - ${PLATFORM_FRONT_DEPTH_PX}px), 100% 100%, 0% 100%)`;
 const SHADOW_CLIP = 'polygon(4% 22px, 96% 22px, 100% 180%, 0% 180%)';
 const SHADOW_MAX_SKEW_DEGREES = 16;
 
@@ -233,6 +232,11 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
     scaleY: landing ? 0.55 : 1,
     x: -5,
   };
+  const platformFrontAnimate = {
+    width: platformWidth,
+    scaleY: landing ? 0.55 : 1,
+    x: -5,
+  };
   const shadowAnimate = {
     ...platformAnimate,
     rotateX: 58,
@@ -305,32 +309,28 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
           bottom: 'calc(-0.14em + 2px)',
           height: '1em',
           transformOrigin: 'bottom left',
-          overflow: 'visible',
+          clipPath: PLATFORM_CLIP,
+          background:
+            'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.34), rgba(var(--stage-rgb), 0.7))',
           filter: 'drop-shadow(0 12px 18px rgba(0,0,0,0.28))',
         }}
         animate={platformAnimate}
         transition={platformTransition}
-      >
-        <span
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            clipPath: PLATFORM_CLIP,
-            background:
-              'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.34), rgba(var(--stage-rgb), 0.7))',
-          }}
-        />
-        <span
-          aria-hidden
-          className="absolute inset-x-0 top-0"
-          style={{
-            height: `calc(100% + ${PLATFORM_FRONT_DEPTH_PX}px)`,
-            clipPath: PLATFORM_FRONT_CLIP,
-            background:
-              'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.78), rgba(var(--stage-rgb), 0.96))',
-          }}
-        />
-      </motion.span>
+      />
+      <motion.span
+        aria-hidden
+        className="absolute z-[1]"
+        style={{
+          left: `-${PLATFORM_OVERHANG_LEFT}px`,
+          bottom: `calc(-0.14em + 2px - ${PLATFORM_FRONT_DEPTH_PX}px)`,
+          height: `${PLATFORM_FRONT_DEPTH_PX}px`,
+          transformOrigin: 'top left',
+          background:
+            'linear-gradient(to bottom, rgba(var(--stage-rgb), 0.78), rgba(var(--stage-rgb), 0.96))',
+        }}
+        animate={platformFrontAnimate}
+        transition={platformTransition}
+      />
 
       {/* Cast shadow on the platform — clipped to platform shape + 3D
           tilt. Only the deepest pixels of the word are visible inside;
