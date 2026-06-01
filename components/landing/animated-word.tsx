@@ -219,7 +219,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
       return;
     }
     const t1 = setTimeout(() => setLanding(true), 330);
-    const t2 = setTimeout(() => setLanding(false), 470);
+    const t2 = setTimeout(() => setLanding(false), 560);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -227,16 +227,20 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
   }, [activeIndex, paused]);
 
   const platformWidth = currentWordWidth + PLATFORM_OVERHANG_TOTAL;
+  const platformImpactOffset = landing ? 2 : 0;
+  const platformFrontDepth = PLATFORM_FRONT_DEPTH_PX + platformImpactOffset;
   const platformAnimate = {
     width: platformWidth,
     rotateX: 52,
-    scaleY: landing ? 0.55 : 1,
+    scaleY: landing ? 1.08 : 1,
     x: -5,
+    y: platformImpactOffset,
   };
   const platformFrontAnimate = {
     width: platformWidth,
-    scaleY: landing ? 0.55 : 1,
+    height: platformFrontDepth,
     x: -5,
+    y: platformImpactOffset,
   };
   const shadowAnimate = {
     ...platformAnimate,
@@ -247,8 +251,10 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
   const shadowBaseOffset = hasDescender ? '15px' : '10px';
   const platformTransition: Transition = {
     width: { type: 'spring', stiffness: 230, damping: 26, mass: 0.7 },
+    height: { duration: 0.14, ease: [0.32, 0.72, 0.32, 1] },
     rotateX: { duration: 0 },
-    scaleY: { type: 'spring', stiffness: landing ? 900 : 240, damping: landing ? 16 : 11 },
+    scaleY: { duration: 0.14, ease: [0.32, 0.72, 0.32, 1] },
+    y: { duration: 0.14, ease: [0.32, 0.72, 0.32, 1] },
   };
 
   return (
@@ -363,7 +369,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
         animate={shadowAnimate}
         transition={platformTransition}
       >
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait">
           <motion.span
             key={current.id}
             // Shadow rises and fades in with the dropping label, then
@@ -395,7 +401,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
 
       {/* Rotating word — drops in, dwells, sinks through with brand→stone
           gradient sweep, then disintegrates with aggressive blur + shrink. */}
-      <AnimatePresence mode="popLayout" initial={false}>
+      <AnimatePresence mode="popLayout">
         <motion.span
           key={current.id}
           initial={paused ? ANIMATE : INITIAL}
