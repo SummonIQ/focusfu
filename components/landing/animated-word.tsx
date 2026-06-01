@@ -145,7 +145,7 @@ function ShadowLabel({ text }: { text: string }) {
           letterIndex === null
             ? 0
             : ((letterIndex - centerIndex) / maxDistance) * SHADOW_MAX_SKEW_DEGREES;
-        const descenderShift = /[gjpqy]/.test(char) ? 'translateX(1px)' : '';
+        const descenderShift = /[gjpqy]/.test(char) ? 'translateX(1px) translateY(2px)' : '';
         const inwardSkew = letterIndex === null ? '' : `skewX(${skewDegrees.toFixed(2)}deg)`;
         const transform = [descenderShift, inwardSkew].filter(Boolean).join(' ');
 
