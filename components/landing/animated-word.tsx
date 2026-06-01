@@ -228,7 +228,8 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
 
   const platformWidth = currentWordWidth + PLATFORM_OVERHANG_TOTAL;
   const platformImpactOffset = landing ? 2 : 0;
-  const platformFrontDepth = PLATFORM_FRONT_DEPTH_PX + platformImpactOffset;
+  const platformFrontGrowth = landing ? 1 : 0;
+  const platformFrontDepth = PLATFORM_FRONT_DEPTH_PX + platformFrontGrowth;
   const platformFrontOffset =
     platformImpactOffset + (platformFrontDepth - PLATFORM_FRONT_DEPTH_PX);
   const platformAnimate = {
