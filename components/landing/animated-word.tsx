@@ -40,7 +40,7 @@ const PLATFORM_OVERHANG_RIGHT = 28; // slightly more on the right so the
                                     // letter hanging over the edge.
 const PLATFORM_OVERHANG_TOTAL = PLATFORM_OVERHANG_LEFT + PLATFORM_OVERHANG_RIGHT;
 const PLATFORM_CLIP = 'polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%)';
-const SHADOW_CLIP = 'polygon(4% 20px, 96% 20px, 100% 140%, 0% 140%)';
+const SHADOW_CLIP = 'polygon(4% 24px, 96% 24px, 100% 180%, 0% 180%)';
 const SHADOW_MAX_SKEW_DEGREES = 16;
 
 const INITIAL = {
