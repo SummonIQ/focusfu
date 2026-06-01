@@ -366,7 +366,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
               transformOrigin: 'left top',
               fontWeight: 'inherit',
               color: 'rgba(0,0,0,0.48)',
-              filter: landing ? 'blur(2.4px)' : 'blur(1.6px)',
+              filter: landing ? 'blur(2.55px)' : 'blur(1.75px)',
               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)',
               maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 100%)',
             }}
