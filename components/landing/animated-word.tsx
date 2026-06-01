@@ -227,6 +227,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
   }, [activeIndex, paused]);
 
   const platformWidth = currentWordWidth + PLATFORM_OVERHANG_TOTAL;
+  const platformImpactOffset = landing ? 2 : 0;
   const platformFrontDepth = landing ? PLATFORM_FRONT_DEPTH_PX - 2.5 : PLATFORM_FRONT_DEPTH_PX;
   const platformAnimate = {
     width: platformWidth,
@@ -238,6 +239,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
     width: platformWidth,
     height: platformFrontDepth,
     x: -5,
+    y: platformImpactOffset,
   };
   const shadowAnimate = {
     ...platformAnimate,
@@ -251,6 +253,7 @@ export function AnimatedWord({ activeIndex, labelOverride, paused = false }: Ani
     height: { type: 'spring', stiffness: landing ? 900 : 240, damping: landing ? 16 : 11 },
     rotateX: { duration: 0 },
     scaleY: { type: 'spring', stiffness: landing ? 900 : 240, damping: landing ? 16 : 11 },
+    y: { type: 'spring', stiffness: landing ? 900 : 240, damping: landing ? 16 : 11 },
   };
 
   return (
