@@ -838,7 +838,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'specific-projects',
-    label: 'Specific Projects',
+    label: 'a Side Project',
     windows: [
       { app: 'Safari', accent: '#fbbf24', toneClass: 'from-[#1a0c08] via-[#2a1408] to-[#0c0604]', render: DinoBrowser },
       { app: 'Cursor', accent: '#fb923c', toneClass: 'from-[#1a1408] via-[#2d1f0a] to-[#0f0a05]', render: DinoEditor },
